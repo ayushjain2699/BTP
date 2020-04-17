@@ -9,13 +9,13 @@ problem = cplex.Cplex()
 # We want to find a minimum of our objective function
 problem.objective.set_sense(problem.objective.sense.minimize)
 #test
-j = 2
-m = 3
-s = 1
-r = 3
-d = 5
-i = 10
-t = 4
+j = 2  #Customer sub index
+m = 3  #Manufacturer sub index
+s = 1  #State sub index
+r = 3  #Region sub index
+d = 5  #District sub index
+i = 10 #Clinic sub index
+t = 4  #Time sub index
 
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
 Ist = np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)]) 
