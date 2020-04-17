@@ -39,16 +39,18 @@ Krs = [0.3,0.4,0.37]
 Kdr = [[0.4,0.5,0.45],[0.8,0.75,0.78],[0.9,0.85,0.88],[0.4,0.55,0.51],[0.33,0.61,0.44]]
 Kid = [[0.43,0.51,0.49,0.51,0.52],[0.79,0.77,0.78,0.72,0.71],[0.35,0.33,0.43,0.35,0.46],[1.07,1.07,1.11,1.12,1.12],[0.87,0.87,0.87,0.87,0.87],[0.36,0.43,0.4,0.42,0.38],[1.11,1.18,1.14,1.21,1.16],[0.95,0.92,0.94,0.98,0.99],[0.7,0.66,0.61,0.63,0.58],[0.92,0.93,0.95,0.89,1]]
 
-#Shortage cost
+#Shortage costs
 Pjt = [[0 for J in range(j)] for T in range(t)]
 for T in range(t):
     Pjt[T][0] = 750000
     Pjt[T][1] = 650000
 Pjt_obj = np.array([[[Pjt[T][J] for I in range(i)] for J in range(j)] for T in range(t)])
+
+#Inventory holding costs
 hrt = [[0 for R in range(r)] for T in range(t)]
 hdt = [[0 for D in range(d)] for T in range(t)]
 hit = [[0 for I in range(i)] for T in range(t)]
-hst = [[0.3],[0.3],[0.3],[0.3]]
+hst = [[0.3],[0.3],[0.3],[0.3]] 
 for T in range(t):
     hrt[T][0] = 0.3
     hrt[T][1] = 0.4
