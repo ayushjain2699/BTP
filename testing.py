@@ -8,6 +8,7 @@ problem = cplex.Cplex()
 
 # We want to find a minimum of our objective function
 problem.objective.set_sense(problem.objective.sense.minimize)
+#test
 j = 2
 m = 3
 s = 1
