@@ -18,6 +18,11 @@ i = 10 #Clinic sub index
 t = 4  #Time sub index
 
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
+#I : Inventory
+#q : Delivery quantity
+#s : shortages
+#w : consumption
+
 Ist = np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)]) 
 Irt = np.array([["I(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
 Idt = np.array([["I(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
