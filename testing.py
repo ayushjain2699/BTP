@@ -94,10 +94,10 @@ lower_bounds = [0 for p in range(len(objective))]
 # # Upper bounds. The default here would be cplex.infinity, or 1e+20.
 upper_bounds = [cplex.infinity for p in range(len(objective))]
 
-# problem.variables.add(obj = objective,
-#                       lb = lower_bounds,
-#                       ub = upper_bounds,
-#                       names = names)
+problem.variables.add(obj = objective,
+                       lb = lower_bounds,
+                      ub = upper_bounds,
+                      names = names)
 
 # # Constraints
 
