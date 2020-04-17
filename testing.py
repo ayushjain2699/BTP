@@ -1,5 +1,5 @@
 #/usr/bin/env python3
-#xyzabc
+
 import cplex
 import numpy as np
 
@@ -29,6 +29,8 @@ qidt = np.array([[["q(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1
 sijt = np.array([[["s(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
 wijt = np.array([[["w(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
 
+names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt),axis=None)
+
 Ksm = [[3],[2.5],[5]]
 Krs = [0.3,0.4,0.37]
 Kdr = [[0.4,0.5,0.45],[0.8,0.75,0.78],[0.9,0.85,0.88],[0.4,0.55,0.51],[0.33,0.61,0.44]]
@@ -38,11 +40,11 @@ Pjt = [[0 for J in range(j)] for T in range(t)]
 for T in range(t):
     Pjt[T][0] = 750000
     Pjt[T][1] = 650000
-
+Pjt_obj = np.array([[[Pjt[T][J] for I in range(i)] for J in range(j)] for T in range(t)])
 hrt = [[0 for R in range(r)] for T in range(t)]
 hdt = [[0 for D in range(d)] for T in range(t)]
 hit = [[0 for I in range(i)] for T in range(t)]
-hst = [[0.3],[0.3],[0.3]]
+hst = [[0.3],[0.3],[0.3],[0.3]]
 for T in range(t):
     hrt[T][0] = 0.3
     hrt[T][1] = 0.4
@@ -65,14 +67,13 @@ for T in range(t):
     hit[T][8] = 0.53
     hit[T][9] = 0.50
 
+print(len(names))
 
-names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt),axis=None)
-#print(len(names))
 
 # # The obective function. More precisely, the coefficients of the objective
 # # function. Note that we are casting to floats.
-# objective = [5.0, 2.0, -1.0]
-
+objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten()))),axis=None)
+print(len(objective))
 # # Lower bounds. Since these are all zero, we could simply not pass them in as
 # # all zeroes is the default.
 # lower_bounds = [0.0, 0.0, 0.0]
