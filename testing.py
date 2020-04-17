@@ -102,16 +102,9 @@ problem.variables.add(obj = objective,
 # # Constraints
 
 # # Constraints are entered in two parts, as a left hand part and a right hand
-# # part. Most times, these will be represented as matrices in your problem. In
-# # our case, we have "3x + y - z ≤ 75" and "3x + 4y + 4z ≤ 160" which we can
-# # write as matrices as follows:
-
-# # [  3   1  -1 ]   [ x ]   [  75 ]
-# # [  3   4   4 ]   [ y ] ≤ [ 160 ]
-# #                  [ z ]
+# # part. Most times, these will be represented as matrices in your problem. 
 
 # # First, we name the constraints
-# constraint_names = ["c1", "c2"]
 
 # # The actual constraints are now added. Each constraint is actually a list
 # # consisting of two objects, each of which are themselves lists. The first list
@@ -126,7 +119,29 @@ problem.variables.add(obj = objective,
 # # "x" was the first variable we added, "y" the second and "z" the third, this
 # # then represents 3x + 4y + 4z
 # second_constraint = [[0, 1, 2], [3.0, 4.0, 4.0]]
-# constraints = [ first_constraint, second_constraint ]
+
+#Inventory balance equations
+c1 = np.array([["c1(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
+c2 = np.array([["c2(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
+c3 = np.array([["c3(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
+c4 = np.array([["c4(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
+
+#Consumption bounded by demand
+c5 = np.array([[["c5(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
+
+#Consumption balance
+c6 = np.array([[["c6(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
+
+#Inventory capacity constraints
+c7 = np.array([["c7(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
+c8 = np.array([["c8(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
+c9 = np.array([["c9(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
+c10 = np.array([["c10(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
+
+#Production capacity constraints at manufacturer end
+c11 = np.array([["c11(i,t)("+str(M)+","+str(T)+")" for M in range(1,m+1)] for T in range(1,t+1)])
+
+constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None)
 
 # # So far we haven't added a right hand side, so we do that now. Note that the
 # # first entry in this list corresponds to the first constraint, and so-on.
