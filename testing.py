@@ -85,12 +85,14 @@ print(len(names))
 # # function. Note that we are casting to floats.
 objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten()))),axis=None)
 print(len(objective))
+
+
 # # Lower bounds. Since these are all zero, we could simply not pass them in as
 # # all zeroes is the default.
-# lower_bounds = [0.0, 0.0, 0.0]
+lower_bounds = [0 for p in range(len(objective))]
 
 # # Upper bounds. The default here would be cplex.infinity, or 1e+20.
-# upper_bounds = [100, 1000, cplex.infinity]
+upper_bounds = [cplex.infinity for p in range(len(objective))]
 
 # problem.variables.add(obj = objective,
 #                       lb = lower_bounds,
