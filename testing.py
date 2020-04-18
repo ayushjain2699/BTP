@@ -262,14 +262,18 @@ for T in range(1,t+1):
         constraint = [[qs,qs_num]]
         constraint_11.extend(constraint)
 
-constraints = [constraint_1 , constraint_2 , constraint_3 , constraint_4 , constraint_5 , constraint_6 , constraint_7 , constraint_8 , constraint_9 , constraint_10 , constraint_11]
+constraints = []
+for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constraint_5,constraint_6,constraint_7,constraint_8,constraint_9,constraint_10,constraint_11]:
+    constraints.extend(constraint)
 
 
+c1_rhs = 0*np.ones(len(c1)).tolist()
+c2_rhs = 0*np.ones(len(c2)).tolist()
+c3_rhs = 0*np.ones(len(c3)).tolist()
+c4_rhs = 0*np.ones(len(c4)).tolist()
 
-print(objective)
-
-
-
+dijt = [[[(1-J)*550+J*425 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
+c5_rhs =  np.array(dijt).flatten().tolist()
 # # So far we haven't added a right hand side, so we do that now. Note that the
 # # first entry in this list corresponds to the first constraint, and so-on.
 # rhs = [75.0, 160.0]
