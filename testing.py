@@ -275,10 +275,19 @@ constraints = [constraint_1 , constraint_2 , constraint_3 , constraint_4 , const
 # rhs = [75.0, 160.0]
 
 # # We need to enter the senses of the constraints. That is, we need to tell Cplex
-# # whether each constrains should be treated as an upper-limit (≤, denoted "L"
+# # whether each constraint should be treated as an upper-limit (≤, denoted "L"
 # # for less-than), a lower limit (≥, denoted "G" for greater than) or an equality
 # # (=, denoted "E" for equality)
 # constraint_senses = [ "L", "L" ]
+
+l1 = np.array(["E" for g in range(1,(s+r+d+i)*t)])
+l2 = np.array(["L" for g in range(1,i*j*t)])
+l3 = np.array(["E" for g in range(1,i*j*t)])
+l4 = np.array(["L" for g in range(1,(s+r+d+i)*t)])
+l5 = np.array(["L" for g in range(1,m*t)])
+
+constraint_senses = np.concatenate(l1,l2,l3,l4,l5).tolist()
+
 
 # # Note that we can actually set senses as a string. That is, we could also use
 # #     constraint_senses = "LL"
