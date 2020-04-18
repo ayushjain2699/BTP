@@ -157,8 +157,61 @@ for T in range(1,t+1):
         constraint = [[list1,list2]]
         constraint_2.extend(constraint)
 
+constraint_1 = []
+for T in range(1,t+1):
+    for S in range(1,s+1):
+
+        if(T==1):
+            I = np.array([Ist[T-1][S-1]])
+        else:
+            I = np.array([Ist[T-2][S-1],Ist[T-1][S-1]])
+        qm = np.array([qsmt[T-1][M-1][S-1] for M in range(1,m+1)])
+        qr = np.array([qrst[T-1][S-1][R-1] for R in range(1,r+1)])
+        list1 = np.concatenate((I,qm,qr),axis=None).tolist()
+        if(T==1):
+            list2 = np.concatenate((np.array([-1]),np.ones(m),-1*np.ones(r)),axis=None).tolist()
+        else:
+            list2 = np.concatenate((np.array([1,-1]),np.ones(m),-1*np.ones(r)),axis=None).tolist()
+        constraint = [[list1,list2]]
+        constraint_1.extend(constraint)
+
+constraint_3 = []
+for T in range(1,t+1):
+    for D in range(1,d+1):
+
+        if(T==1):
+            I = np.array([Idt[T-1][D-1]])
+        else:
+            I = np.array([Idt[T-2][D-1],Idt[T-1][D-1]])
+        qr = np.array([qdrt[T-1][R-1][D-1] for R in range(1,r+1)])
+        qi = np.array([qidt[T-1][D-1][I-1] for I in range(1,i+1)])
+        list1 = np.concatenate((I,qr,qi),axis=None).tolist()
+        if(T==1):
+            list2 = np.concatenate((np.array([-1]),np.ones(r),-1*np.ones(i)),axis=None).tolist()
+        else:
+            list2 = np.concatenate((np.array([1,-1]),np.ones(r),-1*np.ones(i)),axis=None).tolist()
+        constraint = [[list1,list2]]
+        constraint_3.extend(constraint)
+
+constraint_4 = []
+for T in range(1,t+1):
+    for I in range(1,i+1):
+
+        if(T==1):
+            II = np.array([Iit[T-1][I-1]])
+        else:
+            II = np.array([Iit[T-2][I-1],Iit[T-1][I-1]])
+        qd = np.array([qidt[T-1][D-1][I-1] for D in range(1,d+1)])
+        wj = np.array([wijt[T-1][J-1][I-1] for J in range(1,j+1)])
+        list1 = np.concatenate((II,qd,wj),axis=None).tolist()
+        if(T==1):
+            list2 = np.concatenate((np.array([-1]),np.ones(d),-1*np.ones(j)),axis=None).tolist()
+        else:
+            list2 = np.concatenate((np.array([1,-1]),np.ones(d),-1*np.ones(j)),axis=None).tolist()
+        constraint = [[list1,list2]]
+        constraint_4.extend(constraint)
+
 #Defining the constraints
-print((constraint_2))
 
 constraint_5 = [wijt.flatten().tolist(),np.ones(i*j*t).tolist()]
 constraint_6 = [np.concatenate((wijt,sijt),axis=None).tolist(),np.concatenate((np.ones(i*j*t),np.ones(i*j*t)),axis=None)]
