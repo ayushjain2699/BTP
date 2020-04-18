@@ -214,13 +214,11 @@ for T in range(1,t+1):
         constraint_4.extend(constraint)
 
 
-
 constraint_5 = []
 for T in range(1,t+1):
     for J in range(1,j+1):
         for I in range(1,i+1):
-            #print("T is")
-            w=[[wijt[T-1][J-1][I-1],[1]]]
+            w=[[wijt[T-1][J-1][I-1],[1.0]]]
             constraint_5.extend(w)
 
 constraint_6 = []
@@ -228,32 +226,32 @@ for T in range(1,t+1):
     for J in range(1,j+1):
         for I in range(1,i+1):
             list1=[wijt[T-1][J-1][I-1],sijt[T-1][J-1][I-1]]
-            list2=[1,1]
+            list2=[1.0,1.0]
             constraint=[[list1,list2]]
             constraint_6.extend(constraint)
 
 constraint_7 = []
 for T in range(1,t+1):
     for S in range(1,s+1):
-        w=[[Ist[T-1][S-1]],[1]]
+        w=[[Ist[T-1][S-1]],[1.0]]
         constraint_7.extend(w)
 
 constraint_8 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
-        w=[[Irt[T-1][R-1]],[1]]
+        w=[[Irt[T-1][R-1]],[1.0]]
         constraint_8.extend(w)
 
 constraint_9 = []
 for T in range(1,t+1):
     for D in range(1,d+1):
-        w=[[Idt[T-1][D-1]],[1]]
+        w=[[Idt[T-1][D-1]],[1.0]]
         constraint_9.extend(w)
 
 constraint_10 = []
 for T in range(1,t+1):
     for I in range(1,i+1):
-        w=[[Iit[T-1][I-1]],[1]]
+        w=[[Iit[T-1][I-1]],[1.0]]
         constraint_10.extend(w)
 
 constraint_11 = []
