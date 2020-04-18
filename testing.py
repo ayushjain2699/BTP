@@ -146,7 +146,7 @@ constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None
 #Defining the constraints
 
 
-constraint_1 = [np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t)]),np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(2,t+1)]),np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t)])
+
 
 
 
