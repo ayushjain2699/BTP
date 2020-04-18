@@ -139,6 +139,8 @@ c11 = np.array([["c11(i,t)("+str(M)+","+str(T)+")" for M in range(1,m+1)] for T 
 
 constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None)
 
+#Defining the constraints
+
 constraint_2 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
@@ -211,17 +213,65 @@ for T in range(1,t+1):
         constraint = [[list1,list2]]
         constraint_4.extend(constraint)
 
-#Defining the constraints
 
-constraint_5 = [wijt.flatten().tolist(),np.ones(i*j*t).tolist()]
-constraint_6 = [np.concatenate((wijt,sijt),axis=None).tolist(),np.concatenate((np.ones(i*j*t),np.ones(i*j*t)),axis=None)]
-constraint_7 = [Ist.flatten().tolist,np.ones(s*t).tolist()]
-constraint_8 = [Irt.flatten().tolist,np.ones(r*t).tolist()]
-constraint_9 = [Idt.flatten().tolist,np.ones(d*t).tolist()]
-constraint_10 = [Iit.flatten().tolist,np.ones(i*t).tolist()]
 
-q = np.array([[["q(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for M in range(1,m+1)] for S in range(1,s+1)] for T in range(1,t+1)])#Required for constraint 11
-constraint_11 = (q,np.ones(m*s*t))
+constraint_5 = []
+for T in range(1,t+1):
+    for J in range(1,j+1):
+        for I in range(1,i+1):
+            #print("T is")
+            w=[[wijt[T-1][J-1][I-1],[1]]]
+            constraint_5.extend(w)
+
+constraint_6 = []
+for T in range(1,t+1):
+    for J in range(1,j+1):
+        for I in range(1,i+1):
+            list1=[wijt[T-1][J-1][I-1],sijt[T-1][J-1][I-1]]
+            list2=[1,1]
+            constraint=[[list1,list2]]
+            constraint_6.extend(constraint)
+
+constraint_7 = []
+for T in range(1,t+1):
+    for S in range(1,s+1):
+        w=[[Ist[T-1][S-1]],[1]]
+        constraint_7.extend(w)
+
+constraint_8 = []
+for T in range(1,t+1):
+    for R in range(1,r+1):
+        w=[[Irt[T-1][R-1]],[1]]
+        constraint_8.extend(w)
+
+constraint_9 = []
+for T in range(1,t+1):
+    for D in range(1,d+1):
+        w=[[Idt[T-1][D-1]],[1]]
+        constraint_9.extend(w)
+
+constraint_10 = []
+for T in range(1,t+1):
+    for I in range(1,i+1):
+        w=[[Iit[T-1][I-1]],[1]]
+        constraint_10.extend(w)
+
+constraint_11 = []
+for T in range(1,t+1):
+    for M in range(1,m+1):
+        qs = np.array([qsmt[T-1][M-1][S-1] for S in range(1,s+1)]).tolist()
+        qs_num = np.ones(s).tolist()
+        constraint = [[qs,qs_num]]
+        constraint_11.extend(constraint)
+
+constraints = [constraint_1 , constraint_2 , constraint_3 , constraint_4 , constraint_5 , constraint_6 , constraint_7 , constraint_8 , constraint_9 , constraint_10 , constraint_11]
+
+
+
+
+
+
+
 # # So far we haven't added a right hand side, so we do that now. Note that the
 # # first entry in this list corresponds to the first constraint, and so-on.
 # rhs = [75.0, 160.0]
