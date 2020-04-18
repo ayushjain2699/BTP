@@ -264,15 +264,15 @@ for T in range(1,t+1):
 
 constraints = [constraint_1 , constraint_2 , constraint_3 , constraint_4 , constraint_5 , constraint_6 , constraint_7 , constraint_8 , constraint_9 , constraint_10 , constraint_11]
 
+
+
+
+
+
+
 # # So far we haven't added a right hand side, so we do that now. Note that the
 # # first entry in this list corresponds to the first constraint, and so-on.
 # rhs = [75.0, 160.0]
-
-
-
-
-
-
 
 # # We need to enter the senses of the constraints. That is, we need to tell Cplex
 # # whether each constrains should be treated as an upper-limit (≤, denoted "L"
