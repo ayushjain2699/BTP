@@ -157,6 +157,8 @@ constraint_8 = (Irt,np.ones(r*t));
 constraint_9 = (Idt,np.ones(d*t));
 constraint_10 = (Iit,np.ones(i*t));
 
+q = np.array([[["q(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for M in range(1,m+1)] for S in range(1,s+1)] for T in range(1,t+1)])#Required for constraint 11
+constraint_11 = (q,np.ones(m*s*t))
 # # So far we haven't added a right hand side, so we do that now. Note that the
 # # first entry in this list corresponds to the first constraint, and so-on.
 # rhs = [75.0, 160.0]
