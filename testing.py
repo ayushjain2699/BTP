@@ -139,7 +139,26 @@ c11 = np.array([["c11(i,t)("+str(M)+","+str(T)+")" for M in range(1,m+1)] for T 
 
 constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None)
 
+constraint_2 = []
+for T in range(1,t+1):
+    for R in range(1,r+1):
+
+        if(T==1):
+            I = np.array([Irt[T-1][R-1]])
+        else:
+            I = np.array([Irt[T-2][R-1],Irt[T-1][R-1]])
+        qs = np.array([qrst[T-1][S-1][R-1] for S in range(1,s+1)])
+        qd = np.array([qdrt[T-1][R-1][D-1] for D in range(1,d+1)])
+        list1 = np.concatenate((I,qs,qd),axis=None).tolist()
+        if(T==1):
+            list2 = np.concatenate((np.array([-1]),np.ones(s),-1*np.ones(d)),axis=None).tolist()
+        else:
+            list2 = np.concatenate((np.array([1,-1]),np.ones(s),-1*np.ones(d)),axis=None).tolist()
+        constraint = [[list1,list2]]
+        constraint_2.extend(constraint)
+
 #Defining the constraints
+print((constraint_2))
 
 constraint_5 = [wijt.flatten().tolist(),np.ones(i*j*t).tolist()]
 constraint_6 = [np.concatenate((wijt,sijt),axis=None).tolist(),np.concatenate((np.ones(i*j*t),np.ones(i*j*t)),axis=None)]
