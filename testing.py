@@ -218,7 +218,7 @@ constraint_5 = []
 for T in range(1,t+1):
     for J in range(1,j+1):
         for I in range(1,i+1):
-            w=[[wijt[T-1][J-1][I-1],[1.0]]]
+            w=[[[wijt[T-1][J-1][I-1]],[1.0]]]
             constraint_5.extend(w)
 
 constraint_6 = []
@@ -233,25 +233,25 @@ for T in range(1,t+1):
 constraint_7 = []
 for T in range(1,t+1):
     for S in range(1,s+1):
-        w=[[Ist[T-1][S-1]],[1.0]]
+        w=[[[Ist[T-1][S-1]],[1.0]]]
         constraint_7.extend(w)
 
 constraint_8 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
-        w=[[Irt[T-1][R-1]],[1.0]]
+        w=[[[Irt[T-1][R-1]],[1.0]]]
         constraint_8.extend(w)
 
 constraint_9 = []
 for T in range(1,t+1):
     for D in range(1,d+1):
-        w=[[Idt[T-1][D-1]],[1.0]]
+        w=[[[Idt[T-1][D-1]],[1.0]]]
         constraint_9.extend(w)
 
 constraint_10 = []
 for T in range(1,t+1):
     for I in range(1,i+1):
-        w=[[Iit[T-1][I-1]],[1.0]]
+        w=[[[Iit[T-1][I-1]],[1.0]]]
         constraint_10.extend(w)
 
 constraint_11 = []
@@ -262,9 +262,12 @@ for T in range(1,t+1):
         constraint = [[qs,qs_num]]
         constraint_11.extend(constraint)
 
-constraints = [constraint_1 , constraint_2 , constraint_3 , constraint_4 , constraint_5 , constraint_6 , constraint_7 , constraint_8 , constraint_9 , constraint_10 , constraint_11]
+constraints = []
 
+for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constraint_5,constraint_6,constraint_7,constraint_8,constraint_9,constraint_10,constraint_11]:
+    constraints.extend(constraint)
 
+print((constraints))
 
 
 
