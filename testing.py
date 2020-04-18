@@ -218,7 +218,7 @@ constraint_5 = []
 for T in range(1,t+1):
     for J in range(1,j+1):
         for I in range(1,i+1):
-            w=[[wijt[T-1][J-1][I-1],[1.0]]]
+            w=[[[wijt[T-1][J-1][I-1]],[1.0]]]
             constraint_5.extend(w)
 
 constraint_6 = []
@@ -233,25 +233,25 @@ for T in range(1,t+1):
 constraint_7 = []
 for T in range(1,t+1):
     for S in range(1,s+1):
-        w=[[Ist[T-1][S-1]],[1.0]]
+        w=[[[Ist[T-1][S-1]],[1.0]]]
         constraint_7.extend(w)
 
 constraint_8 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
-        w=[[Irt[T-1][R-1]],[1.0]]
+        w=[[[Irt[T-1][R-1]],[1.0]]]
         constraint_8.extend(w)
 
 constraint_9 = []
 for T in range(1,t+1):
     for D in range(1,d+1):
-        w=[[Idt[T-1][D-1]],[1.0]]
+        w=[[[Idt[T-1][D-1]],[1.0]]]
         constraint_9.extend(w)
 
 constraint_10 = []
 for T in range(1,t+1):
     for I in range(1,i+1):
-        w=[[Iit[T-1][I-1]],[1.0]]
+        w=[[[Iit[T-1][I-1]],[1.0]]]
         constraint_10.extend(w)
 
 constraint_11 = []
@@ -267,13 +267,22 @@ for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constrain
     constraints.extend(constraint)
 
 
-c1_rhs = 0*np.ones(len(c1)).tolist()
-c2_rhs = 0*np.ones(len(c2)).tolist()
-c3_rhs = 0*np.ones(len(c3)).tolist()
-c4_rhs = 0*np.ones(len(c4)).tolist()
+c1_rhs = 0*np.ones(len(c1.flatten()))
+c2_rhs = 0*np.ones(len(c2.flatten()))
+c3_rhs = 0*np.ones(len(c3.flatten()))
+c4_rhs = 0*np.ones(len(c4.flatten()))
 
 dijt = [[[(1-J)*550+J*425 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
-c5_rhs =  np.array(dijt).flatten().tolist()
+c5_rhs =  np.array(dijt).flatten()
+c6_rhs = c5_rhs
+c7_rhs = 56250*np.ones(s*t)
+c8_rhs = 28125*np.ones(r*t)
+c9_rhs = 2031*np.ones(d*t)
+c10_rhs = 250*np.ones(i*t)
+Bmt = [[M for M in [12000,15000,11000]] for T in range(t)]
+c11_rhs = np.array(Bmt).flatten()
+
+rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs),axis=None).tolist()
 # # So far we haven't added a right hand side, so we do that now. Note that the
 # # first entry in this list corresponds to the first constraint, and so-on.
 # rhs = [75.0, 160.0]
@@ -284,13 +293,14 @@ c5_rhs =  np.array(dijt).flatten().tolist()
 # # (=, denoted "E" for equality)
 # constraint_senses = [ "L", "L" ]
 
-l1 = np.array(["E" for g in range(1,(s+r+d+i)*t)])
-l2 = np.array(["L" for g in range(1,i*j*t)])
-l3 = np.array(["E" for g in range(1,i*j*t)])
-l4 = np.array(["L" for g in range(1,(s+r+d+i)*t)])
-l5 = np.array(["L" for g in range(1,m*t)])
+l1 = np.array(["E" for g in range((s+r+d+i)*t)])
+l2 = np.array(["L" for g in range(i*j*t)])
+l3 = np.array(["E" for g in range(i*j*t)])
+l4 = np.array(["L" for g in range((s+r+d+i)*t)])
+l5 = np.array(["L" for g in range(m*t)])
 
-constraint_senses = np.concatenate(l1,l2,l3,l4,l5).tolist()
+constraint_senses = np.concatenate((l1,l2,l3,l4,l5),axis=None).tolist()
+
 
 
 # # Note that we can actually set senses as a string. That is, we could also use
@@ -298,10 +308,10 @@ constraint_senses = np.concatenate(l1,l2,l3,l4,l5).tolist()
 # # to pass in our constraints
 
 # # And add the constraints
-# problem.linear_constraints.add(lin_expr = constraints,
-#                                senses = constraint_senses,
-#                                rhs = rhs,
-#                                names = constraint_names)
+problem.linear_constraints.add(lin_expr = constraints,
+                               senses = constraint_senses,
+                               rhs = rhs,
+                               names = constraint_names)
 
 # # Solve the problem
 # problem.solve()
