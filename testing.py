@@ -156,6 +156,7 @@ constraint_7 = (Ist,np.ones(s*t));
 constraint_8 = (Irt,np.ones(r*t));
 constraint_9 = (Idt,np.ones(d*t));
 constraint_10 = (Iit,np.ones(i*t));
+
 # # So far we haven't added a right hand side, so we do that now. Note that the
 # # first entry in this list corresponds to the first constraint, and so-on.
 # rhs = [75.0, 160.0]
