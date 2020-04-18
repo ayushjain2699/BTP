@@ -78,14 +78,10 @@ for T in range(t):
     hit[T][8] = 0.53
     hit[T][9] = 0.50
 
-print(len(names))
-
 
 # # The obective function. More precisely, the coefficients of the objective
 # # function. Note that we are casting to floats.
 objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten()))),axis=None)
-print(len(objective))
-
 
 # # Lower bounds. Since these are all zero, we could simply not pass them in as
 # # all zeroes is the default.
@@ -97,7 +93,7 @@ upper_bounds = [cplex.infinity for p in range(len(objective))]
 problem.variables.add(obj = objective,
                        lb = lower_bounds,
                       ub = upper_bounds,
-                      names = names)
+                      names = names.tolist())
 
 # # Constraints
 
@@ -145,17 +141,12 @@ constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None
 
 #Defining the constraints
 
-
-
-
-
-
-constraint_5 = (wijt,np.ones(i*j*t));
-constraint_6 = ([wijt,sijt],[np.ones(i*j*t),np.ones(i*j*t)]);
-constraint_7 = (Ist,np.ones(s*t));
-constraint_8 = (Irt,np.ones(r*t));
-constraint_9 = (Idt,np.ones(d*t));
-constraint_10 = (Iit,np.ones(i*t));
+constraint_5 = [wijt.flatten().tolist(),np.ones(i*j*t).tolist()]
+constraint_6 = [np.concatenate((wijt,sijt),axis=None).tolist(),np.concatenate((np.ones(i*j*t),np.ones(i*j*t)),axis=None)]
+constraint_7 = [Ist.flatten().tolist,np.ones(s*t).tolist()]
+constraint_8 = [Irt.flatten().tolist,np.ones(r*t).tolist()]
+constraint_9 = [Idt.flatten().tolist,np.ones(d*t).tolist()]
+constraint_10 = [Iit.flatten().tolist,np.ones(i*t).tolist()]
 
 q = np.array([[["q(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for M in range(1,m+1)] for S in range(1,s+1)] for T in range(1,t+1)])#Required for constraint 11
 constraint_11 = (q,np.ones(m*s*t))
