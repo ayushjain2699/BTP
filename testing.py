@@ -267,9 +267,12 @@ constraints = []
 for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constraint_5,constraint_6,constraint_7,constraint_8,constraint_9,constraint_10,constraint_11]:
     constraints.extend(constraint)
 
-print((constraints))
+c1_rhs = 0*np.ones(len(c1))
+c2_rhs = 0*np.ones(len(c2))
+c3_rhs = 0*np.ones(len(c3))
+c4_rhs = 0*np.ones(len(c4))
 
-
+print(objective)
 
 
 
