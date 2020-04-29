@@ -2,7 +2,6 @@
 
 import cplex
 import numpy as np
-
 # Create an instance of a linear problem to solve
 problem = cplex.Cplex()
 
@@ -17,11 +16,19 @@ d = 5  #District sub index
 i = 10 #Clinic sub index
 t = 4  #Time sub index
 
+nc = (s+d+r+i)*t+(d*r+s*m+r*s+i*d)*t+2*i*j*t #Total number of continuous variables
+nb = (d*r+s*m+r*s+i*d)*t #Total number of binary variables
+
+type_c = np.array(["C" for NC in range(nc)])
+type_b = np.array(["B" for NB in range(nb)])
+types = np.concatenate((type_c,type_b),axis = None)
+
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
 #I : Inventory
 #q : Delivery quantity
 #s : Shortages
 #w : Consumption
+#X : Binary variable
 
 Ist = np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)]) 
 Irt = np.array([["I(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
@@ -36,7 +43,12 @@ qidt = np.array([[["q(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1
 sijt = np.array([[["s(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
 wijt = np.array([[["w(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
 
-names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt),axis=None)
+Xdrt = np.array([[["X(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+Xsmt = np.array([[["X(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+Xrst = np.array([[["X(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+Xidt = np.array([[["X(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+
+names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt,Xdrt,Xsmt,Xrst,Xidt),axis=None)
 
 #Transportation cost per unit
 Ksm = [[3],[2.5],[5]]
@@ -78,13 +90,16 @@ for T in range(t):
     hit[T][8] = 0.53
     hit[T][9] = 0.50
 
-
-# # The obective function. More precisely, the coefficients of the objective
-# # function. Note that we are casting to floats.
-objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten()))),axis=None)
+#Ordering costs
+Csmt = [[[25000 for S in range(s)] for M in range(m)] for T in range(t)]
+Crst = [[[25000 for R in range(r)] for S in range(s)] for T in range(t)]
+Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
+Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
+# # The obective function. More precisely, the coefficients of the objective function. 
+objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten())),Cdrt,Csmt,Crst,Cidt),axis=None)
 #print(objective)
-# # Lower bounds. Since these are all zero, we could simply not pass them in as
-# # all zeroes is the default.
+
+# # Lower bounds. Since these are all zero, we could simply not pass them in as all zeroes is the default.
 lower_bounds = [0 for p in range(len(objective))]
 
 # # Upper bounds. The default here would be cplex.infinity, or 1e+20.
@@ -93,28 +108,10 @@ upper_bounds = [cplex.infinity for p in range(len(objective))]
 problem.variables.add(obj = objective,
                        lb = lower_bounds,
                       ub = upper_bounds,
-                      names = names.tolist())
+                      names = names.tolist(),
+                      types = types)
 
 # # Constraints
-
-# # Constraints are entered in two parts, as a left hand part and a right hand
-# # part. Most times, these will be represented as matrices in your problem. 
-
-# # First, we name the constraints
-
-# # The actual constraints are now added. Each constraint is actually a list
-# # consisting of two objects, each of which are themselves lists. The first list
-# # represents each of the variables in the constraint, and the second list is the
-# # coefficient of the respective variable. Data is entered in this way as the
-# # constraints matrix is often sparse.
-
-# # The first constraint is entered by referring to each variable by its name
-# # (which we defined earlier). This then represents "3x + y - z"
-# first_constraint = [["x", "y", "z"], [3.0, 1.0, -1.0]]
-# # In this second constraint, we refer to the variables by their indices. Since
-# # "x" was the first variable we added, "y" the second and "z" the third, this
-# # then represents 3x + 4y + 4z
-# second_constraint = [[0, 1, 2], [3.0, 4.0, 4.0]]
 
 #Inventory balance equations
 c1 = np.array([["c1(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
@@ -283,16 +280,8 @@ Bmt = [[M for M in [12000,15000,11000]] for T in range(t)]
 c11_rhs = np.array(Bmt).flatten()
 
 rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs),axis=None).tolist()
-# # So far we haven't added a right hand side, so we do that now. Note that the
-# # first entry in this list corresponds to the first constraint, and so-on.
-# rhs = [75.0, 160.0]
 
-# # We need to enter the senses of the constraints. That is, we need to tell Cplex
-# # whether each constraint should be treated as an upper-limit (≤, denoted "L"
-# # for less-than), a lower limit (≥, denoted "G" for greater than) or an equality
-# # (=, denoted "E" for equality)
-# constraint_senses = [ "L", "L" ]
-
+#Adding constraint senses
 l1 = np.array(["E" for g in range((s+r+d+i)*t)])
 l2 = np.array(["L" for g in range(i*j*t)])
 l3 = np.array(["E" for g in range(i*j*t)])
@@ -301,12 +290,6 @@ l5 = np.array(["L" for g in range(m*t)])
 
 constraint_senses = np.concatenate((l1,l2,l3,l4,l5),axis=None).tolist()
 
-
-
-# # Note that we can actually set senses as a string. That is, we could also use
-# #     constraint_senses = "LL"
-# # to pass in our constraints
-
 # # And add the constraints
 problem.linear_constraints.add(lin_expr = constraints,
                                senses = constraint_senses,
@@ -314,10 +297,10 @@ problem.linear_constraints.add(lin_expr = constraints,
                                names = constraint_names)
 
 # # Solve the problem
-problem.solve()
+#problem.solve()
 
 # # And print the solutions
 #print(problem.solution.get_values())
-sol = problem.solution.get_values()
-for x in range(len(sol)):
-    print(names[x]," = ",sol[x])
+# sol = problem.solution.get_values()
+# for x in range(len(sol)):
+#     print(names[x]," = ",sol[x])
