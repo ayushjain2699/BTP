@@ -67,7 +67,7 @@ for T in range(t):
     hdt[T][3] = 0.48
     hdt[T][4] = 0.42
 for T in range(t):
-    hit[T][0] = 0.5
+    hit[T][0] = 0.5                 
     hit[T][1] = 0.46
     hit[T][2] = 0.44
     hit[T][3] = 0.51
@@ -315,9 +315,18 @@ problem.linear_constraints.add(lin_expr = constraints,
 
 # # Solve the problem
 problem.solve()
+#<<<<<<< HEAD
 
 # # And print the solutions
 #print(problem.solution.get_values())
 sol = problem.solution.get_values()
 for x in range(len(sol)):
     print(names[x]," = ",sol[x])
+#=======
+answers = problem.solution.get_values()
+for i in range(len(names)):
+    print(names[i]," - ", end =" ") 
+    print(answers[i])
+# # And print the solutions
+#print(problem.solution.get_values())
+#>>>>>>> e4f467bb64fb18ec30a7d9646fbf636e440c97e5
