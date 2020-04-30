@@ -20,8 +20,8 @@ t = 4  #Time sub index
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
 #I : Inventory
 #q : Delivery quantity
-#s : shortages
-#w : consumption
+#s : Shortages
+#w : Consumption
 
 Ist = np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)]) 
 Irt = np.array([["I(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
@@ -82,7 +82,7 @@ for T in range(t):
 # # The obective function. More precisely, the coefficients of the objective
 # # function. Note that we are casting to floats.
 objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten()))),axis=None)
-
+#print(objective)
 # # Lower bounds. Since these are all zero, we could simply not pass them in as
 # # all zeroes is the default.
 lower_bounds = [0 for p in range(len(objective))]
@@ -137,7 +137,7 @@ c10 = np.array([["c10(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T 
 #Production capacity constraints at manufacturer end
 c11 = np.array([["c11(i,t)("+str(M)+","+str(T)+")" for M in range(1,m+1)] for T in range(1,t+1)])
 
-constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None)
+constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None).tolist()
 
 #Defining the constraints
 
@@ -314,7 +314,10 @@ problem.linear_constraints.add(lin_expr = constraints,
                                names = constraint_names)
 
 # # Solve the problem
-# problem.solve()
+problem.solve()
 
 # # And print the solutions
-# print(problem.solution.get_values())
+#print(problem.solution.get_values())
+sol = problem.solution.get_values()
+for x in range(len(sol)):
+    print(names[x]," = ",sol[x])
