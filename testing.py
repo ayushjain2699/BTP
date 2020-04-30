@@ -67,7 +67,7 @@ for T in range(t):
     hdt[T][3] = 0.48
     hdt[T][4] = 0.42
 for T in range(t):
-    hit[T][0] = 0.5
+    hit[T][0] = 0.5                 
     hit[T][1] = 0.46
     hit[T][2] = 0.44
     hit[T][3] = 0.51
@@ -137,7 +137,7 @@ c10 = np.array([["c10(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T 
 #Production capacity constraints at manufacturer end
 c11 = np.array([["c11(i,t)("+str(M)+","+str(T)+")" for M in range(1,m+1)] for T in range(1,t+1)])
 
-constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None)
+constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11),axis=None).tolist()
 
 #Defining the constraints
 
@@ -314,7 +314,10 @@ problem.linear_constraints.add(lin_expr = constraints,
                                names = constraint_names)
 
 # # Solve the problem
-# problem.solve()
-
+problem.solve()
+answers = problem.solution.get_values()
+for i in range(len(names)):
+    print(names[i]," - ", end =" ") 
+    print(answers[i])
 # # And print the solutions
-# print(problem.solution.get_values())
+#print(problem.solution.get_values())
