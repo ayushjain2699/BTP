@@ -142,7 +142,7 @@ c16 = np.array([[["c16(r,d,t)("+str(R)+","+str(D)+","+str(T)+")" for R in range(
 c17 = np.array([[["c17(r,d,t)("+str(R)+","+str(D)+","+str(T)+")" for R in range(1,r+1)] for D in range(1,d+1)] for T in range(1,t+1)])
 c18 = np.array([[["c18(d,i,t)("+str(D)+","+str(I)+","+str(T)+")" for D in range(1,d+1)] for I in range(1,i+1)] for T in range(1,t+1)])
 c19 = np.array([[["c19(d,i,t)("+str(D)+","+str(I)+","+str(T)+")" for D in range(1,d+1)] for I in range(1,i+1)] for T in range(1,t+1)])
-constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19),axis=None).tolist()
+constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19),axis=None).tolist()                          
 
 #Defining the constraints
 
@@ -267,12 +267,14 @@ for T in range(1,t+1):
         constraint = [[qs,qs_num]]
         constraint_11.extend(constraint)
 
+INF = cplex.infinity;
+
 constraint_12 = []
 for T in range(1,t+1):
     for S in range(1,s+1):
         for M in range(1,m+1):
             var = [Xsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
-            coeff = [1,-10000]
+            coeff = [1,-INF]
             constraint = [[var,coeff]]
             constraint_12.extend(constraint)
 
@@ -281,7 +283,7 @@ for T in range(1,t+1):
     for S in range(1,s+1):
         for M in range(1,m+1):
             var = [Xsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
-            coeff = [-10000,1]
+            coeff = [-INF,1]
             constraint = [[var,coeff]]
             constraint_13.extend(constraint)
 
@@ -290,7 +292,7 @@ for T in range(1,t+1):
     for R in range(1,r+1):
         for S in range(1,s+1):
             var = [Xrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
-            coeff = [1,-10000]
+            coeff = [1,-INF]
             constraint = [[var,coeff]]
             constraint_14.extend(constraint)
 
@@ -299,7 +301,7 @@ for T in range(1,t+1):
     for R in range(1,r+1):
         for S in range(1,s+1):
             var = [Xrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
-            coeff = [-10000,1]
+            coeff = [-INF,1]
             constraint = [[var,coeff]]
             constraint_15.extend(constraint)
 
@@ -308,7 +310,7 @@ for T in range(1,t+1):
     for D in range(1,d+1):
         for R in range(1,r+1):
             var = [Xdrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
-            coeff = [1,-10000]
+            coeff = [1,-INF]
             constraint = [[var,coeff]]
             constraint_16.extend(constraint)
 
@@ -317,7 +319,7 @@ for T in range(1,t+1):
     for D in range(1,d+1):
         for R in range(1,r+1):
             var = [Xdrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
-            coeff = [-10000,1]
+            coeff = [-INF,1]
             constraint = [[var,coeff]]
             constraint_17.extend(constraint)
 
@@ -326,7 +328,7 @@ for T in range(1,t+1):
     for I in range(1,i+1):
         for D in range(1,d+1):
             var = [Xidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
-            coeff = [1,-10000]
+            coeff = [1,-INF]
             constraint = [[var,coeff]]
             constraint_18.extend(constraint)
 
@@ -335,7 +337,7 @@ for T in range(1,t+1):
     for I in range(1,i+1):
         for D in range(1,d+1):
             var = [Xidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
-            coeff = [-10000,1]
+            coeff = [-INF,1]
             constraint = [[var,coeff]]
             constraint_19.extend(constraint)
 
@@ -358,14 +360,14 @@ c9_rhs = 2031*np.ones(d*t)
 c10_rhs = 250*np.ones(i*t)
 Bmt = [[M for M in [12000,15000,11000]] for T in range(t)]
 c11_rhs = np.array(Bmt).flatten()
-c12_rhs = np.ones(m*s*t);
-c13_rhs = np.ones(m*s*t);
-c14_rhs = np.ones(r*s*t);
-c15_rhs = np.ones(r*s*t);
-c16_rhs = np.ones(r*d*t);
-c17_rhs = np.ones(r*d*t);
-c18_rhs = np.ones(i*d*t);
-c19_rhs = np.ones(i*d*t);
+c12_rhs = 0*np.ones(m*s*t);
+c13_rhs = 0*np.ones(m*s*t);
+c14_rhs = 0*np.ones(r*s*t);
+c15_rhs = 0*np.ones(r*s*t);
+c16_rhs = 0*np.ones(r*d*t);
+c17_rhs = 0*np.ones(r*d*t);
+c18_rhs = 0*np.ones(i*d*t);
+c19_rhs = 0*np.ones(i*d*t);
 
 rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs,c12_rhs,c13_rhs,c14_rhs,c15_rhs,c16_rhs,c17_rhs,c18_rhs,c19_rhs),axis=None).tolist()
 
@@ -389,7 +391,9 @@ problem.linear_constraints.add(lin_expr = constraints,
 problem.solve()
 
 # And print the solutions
-print(problem.solution.get_values())
+#print(problem.solution.get_values())
 sol = problem.solution.get_values()
 for x in range(len(sol)):
     print(names[x]," = ",sol[x])
+
+
