@@ -267,7 +267,7 @@ for T in range(1,t+1):
         constraint = [[qs,qs_num]]
         constraint_11.extend(constraint)
 
-INF = cplex.infinity;
+INF = 100000;
 
 constraint_12 = []
 for T in range(1,t+1):
@@ -392,8 +392,11 @@ problem.solve()
 
 # And print the solutions
 #print(problem.solution.get_values())
+ni = (s+r+d+i)*t
 sol = problem.solution.get_values()
 for x in range(len(sol)):
-    print(names[x]," = ",sol[x])
+    print(names[x]," = ",round(sol[x]))
+for x in range(nb):
+    print(names[x+ni]," = ", round(sol[x+ni]), " ", names[x+ni+2*i*j*t+nb], " = ", round(sol[x+ni+2*i*j*t+nb]))
 
 
