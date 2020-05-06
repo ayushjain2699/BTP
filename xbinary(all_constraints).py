@@ -18,9 +18,9 @@ t = 4  #Time sub index
 
 nc = (s+d+r+i)*t+(d*r+s*m+r*s+i*d)*t+2*i*j*t #Total number of continuous variables
 nb = (d*r+s*m+r*s+i*d)*t #Total number of binary variables
-
-type_c = np.array(["C" for NC in range(nc)])
-type_b = np.array(["B" for NB in range(nb)])
+ty = problem.variables.type
+type_c = np.array([ty.integer for NC in range(nc)])
+type_b = np.array([ty.binary for NB in range(nb)])
 types = np.concatenate((type_c,type_b),axis = None)
 
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
@@ -51,10 +51,12 @@ Xidt = np.array([[["X(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1
 names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt,Xdrt,Xsmt,Xrst,Xidt),axis=None)
 
 #Transportation cost per unit
-Ksm = [[3],[2.5],[5]]
+Ksm = [[3],[2.5],[5]]   
 Krs = [0.3,0.4,0.37]
-Kdr = [[0.4,0.5,0.45],[0.8,0.75,0.78],[0.9,0.85,0.88],[0.4,0.55,0.51],[0.33,0.61,0.44]]
-Kid = [[0.43,0.51,0.49,0.51,0.52],[0.79,0.77,0.78,0.72,0.71],[0.35,0.33,0.43,0.35,0.46],[1.07,1.07,1.11,1.12,1.12],[0.87,0.87,0.87,0.87,0.87],[0.36,0.43,0.4,0.42,0.38],[1.11,1.18,1.14,1.21,1.16],[0.95,0.92,0.94,0.98,0.99],[0.7,0.66,0.61,0.63,0.58],[0.92,0.93,0.95,0.89,1]]
+#Kdr = [[0.4,0.5,0.45],[0.8,0.75,0.78],[0.9,0.85,0.88],[0.4,0.55,0.51],[0.33,0.61,0.44]]
+Kdr = [[0.4,0.8,0.9,0.4,0.33],[0.5,0.75,0.85,0.55,0.61],[0.45,0.78,0.88,0.51,0.44]]
+#Kid = [[0.43,0.51,0.49,0.51,0.52],[0.79,0.77,0.78,0.72,0.71],[0.35,0.33,0.43,0.35,0.46],[1.07,1.07,1.11,1.12,1.12],[0.87,0.87,0.87,0.87,0.87],[0.36,0.43,0.4,0.42,0.38],[1.11,1.18,1.14,1.21,1.16],[0.95,0.92,0.94,0.98,0.99],[0.7,0.66,0.61,0.63,0.58],[0.92,0.93,0.95,0.89,1]]
+Kid = [[0.43,0.79,0.35,1.07,0.87,0.36,1.11,0.95,0.7,0.92],[0.51,0.77,0.33,1.07,0.87,0.43,1.18,0.92,0.66,0.93],[0.49,0.78,0.43,1.11,0.87,0.4,1.41,0.94,0.61,0.95],[0.51,0.72,0.35,1.12,0.87,0.42,1.21,0.98,0.63,0.89],[0.52,0.71,0.46,1.12,0.87,0.38,1.16,0.99,0.58,1]]
 
 #Shortage costs
 Pjt = [[0 for J in range(j)] for T in range(t)]
@@ -74,7 +76,7 @@ for T in range(t):
     hrt[T][2] = 0.35
 for T in range(t):
     hdt[T][0] = 0.4
-    hdt[T][1] = 0.44
+    hdt[T][1] = 0.44    
     hdt[T][2] = 0.38
     hdt[T][3] = 0.48
     hdt[T][4] = 0.42
@@ -270,7 +272,7 @@ for T in range(1,t+1):
         constraint = [[qs,qs_num]]
         constraint_11.extend(constraint)
 
-INF = cplex.infinity;
+INF = 100000;
 
 constraint_12 = []
 for T in range(1,t+1):
@@ -408,7 +410,7 @@ l3 = np.array(["E" for g in range(i*j*t)])
 l4 = np.array(["L" for g in range((s+r+d+i)*t)])
 l5 = np.array(["L" for g in range(m*t)])
 l6 = np.array(["L" for g in range((m*s+s*r+r*d+d*i)*2*t)])
-l7 = np.array(["E" for g in range((r+d+i)*t)])
+l7 = np.array(["L" for g in range((r+d+i)*t)])
 
 
 constraint_senses = np.concatenate((l1,l2,l3,l4,l5,l6,l7),axis=None).tolist()
