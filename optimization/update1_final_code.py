@@ -34,6 +34,8 @@ types = np.concatenate((type_c,type_b,type_for_N),axis = None)
 #w : Consumption
 #X : Binary variable
 
+wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
+
 Ist = np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)]) 
 Irt = np.array([["I(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
 Idt = np.array([["I(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
@@ -505,8 +507,8 @@ c2_rhs = 0*np.ones(len(c2.flatten()))
 c3_rhs = 0*np.ones(len(c3.flatten()))
 c4_rhs = 0*np.ones(len(c4.flatten()))
 
-dijt = [[[(1-J)*550+J*425 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
-c5_rhs =  np.array(dijt).flatten()
+dijt = [[[(1-J)*550/wastage_factor+J*425/wastage_factor for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
+c5_rhs = np.array(dijt).flatten()
 c6_rhs = c5_rhs
 c7_rhs = 56250*np.ones(s*t)
 c8_rhs = 28125*np.ones(r*t)
