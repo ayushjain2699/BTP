@@ -24,7 +24,8 @@ nb = (d*r+s*m+r*s+i*d)*t #Total number of binary variables
 
 type_c = np.array(["I" for NC in range(nc)])
 type_b = np.array(["B" for NB in range(nb)])
-types = np.concatenate((type_c,type_b),axis = None)
+type_for_N = np.array(["I" for j in range((s*m+r*s+d*r+i*d)*t)])
+types = np.concatenate((type_c,type_b,type_for_N),axis = None)
 
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
 #I : Inventory
@@ -51,15 +52,36 @@ Xsmt = np.array([[["X(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1
 Xrst = np.array([[["X(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
 Xidt = np.array([[["X(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
 
-names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt,Xdrt,Xsmt,Xrst,Xidt),axis=None)
+Nsmt = np.array([[["N(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+Nrst = np.array([[["N(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+Ndrt = np.array([[["N(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+Nidt = np.array([[["N(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+    
+names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt,Xdrt,Xsmt,Xrst,Xidt,Nsmt,Nrst,Ndrt,Nidt),axis=None)
 
 #Transportation cost per unit
-Ksm = [[3],[2.5],[5]]   
-Krs = [0.3,0.4,0.37]
-#Kdr = [[0.4,0.5,0.45],[0.8,0.75,0.78],[0.9,0.85,0.88],[0.4,0.55,0.51],[0.33,0.61,0.44]]
-Kdr = [[0.4,0.8,0.9,0.4,0.33],[0.5,0.75,0.85,0.55,0.61],[0.45,0.78,0.88,0.51,0.44]]
-#Kid = [[0.43,0.51,0.49,0.51,0.52],[0.79,0.77,0.78,0.72,0.71],[0.35,0.33,0.43,0.35,0.46],[1.07,1.07,1.11,1.12,1.12],[0.87,0.87,0.87,0.87,0.87],[0.36,0.43,0.4,0.42,0.38],[1.11,1.18,1.14,1.21,1.16],[0.95,0.92,0.94,0.98,0.99],[0.7,0.66,0.61,0.63,0.58],[0.92,0.93,0.95,0.89,1]]
-Kid = [[0.43,0.79,0.35,1.07,0.87,0.36,1.11,0.95,0.7,0.92],[0.51,0.77,0.33,1.07,0.87,0.43,1.18,0.92,0.66,0.93],[0.49,0.78,0.43,1.11,0.87,0.4,1.41,0.94,0.61,0.95],[0.51,0.72,0.35,1.12,0.87,0.42,1.21,0.98,0.63,0.89],[0.52,0.71,0.46,1.12,0.87,0.38,1.16,0.99,0.58,1]]
+diesel_cost = 14
+booking_cost = 10000
+np.random.seed(133)
+Dsm = np.random.normal(1000,250,s*m).reshape(m,s)
+Drs = np.random.normal(400,75,r*s).reshape(s,r)
+Ddr = np.random.normal(200,25,d*r).reshape(r,d)
+Did = np.random.normal(100,25,d*i).reshape(d,i)
+cap_veh_sm = 5000 
+cap_veh_rs = 3000
+cap_veh_dr = 3000
+cap_veh_id = 1000
+
+Ksmt = np.array([[[Dsm[M][S]*diesel_cost+booking_cost for S in range(0,s)] for M in range(0,m)] for T in range(0,t)])
+Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
+Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost for D in range(0,d)] for R in range(0,r)] for T in range(0,t)])
+Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
+# Ksm = [[3],[2.5],[5]]   
+# Krs = [0.3,0.4,0.37]
+# #Kdr = [[0.4,0.5,0.45],[0.8,0.75,0.78],[0.9,0.85,0.88],[0.4,0.55,0.51],[0.33,0.61,0.44]]
+# Kdr = [[0.4,0.8,0.9,0.4,0.33],[0.5,0.75,0.85,0.55,0.61],[0.45,0.78,0.88,0.51,0.44]]
+# #Kid = [[0.43,0.51,0.49,0.51,0.52],[0.79,0.77,0.78,0.72,0.71],[0.35,0.33,0.43,0.35,0.46],[1.07,1.07,1.11,1.12,1.12],[0.87,0.87,0.87,0.87,0.87],[0.36,0.43,0.4,0.42,0.38],[1.11,1.18,1.14,1.21,1.16],[0.95,0.92,0.94,0.98,0.99],[0.7,0.66,0.61,0.63,0.58],[0.92,0.93,0.95,0.89,1]]
+# Kid = [[0.43,0.79,0.35,1.07,0.87,0.36,1.11,0.95,0.7,0.92],[0.51,0.77,0.33,1.07,0.87,0.43,1.18,0.92,0.66,0.93],[0.49,0.78,0.43,1.11,0.87,0.4,1.41,0.94,0.61,0.95],[0.51,0.72,0.35,1.12,0.87,0.42,1.21,0.98,0.63,0.89],[0.52,0.71,0.46,1.12,0.87,0.38,1.16,0.99,0.58,1]]
 
 #Shortage costs
 Pjt = [[0 for J in range(j)] for T in range(t)]
@@ -96,12 +118,12 @@ for T in range(t):
     hit[T][9] = 0.50
 
 #Ordering costs
-Csmt = [[[2500000 for S in range(s)] for M in range(m)] for T in range(t)]
-Crst = [[[2500000 for R in range(r)] for S in range(s)] for T in range(t)]
-Cdrt = [[[2500000 for D in range(d)] for R in range(r)] for T in range(t)]
-Cidt = [[[2500000 for I in range(i)] for D in range(d)] for T in range(t)]
+Csmt = [[[25000 for S in range(s)] for M in range(m)] for T in range(t)]
+Crst = [[[25000 for R in range(r)] for S in range(s)] for T in range(t)]
+Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
+Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
 # # The obective function. More precisely, the coefficients of the objective function. 
-objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten())),Cdrt,Csmt,Crst,Cidt),axis=None)
+objective = np.concatenate((hst,hrt,hdt,hit,np.zeros(s*m*t),np.zeros(r*s*t),np.zeros(d*r*t),np.zeros(i*d*t),Pjt_obj,np.array([0]*len(wijt.flatten())),Cdrt,Csmt,Crst,Cidt,Ksmt,Krst,Kdrt,Kidt),axis=None)
 #print(objective)
 
 # # Lower bounds. Since these are all zero, we could simply not pass them in as all zeroes is the default.
@@ -150,7 +172,17 @@ c19 = np.array([[["c19(d,i,t)("+str(D)+","+str(I)+","+str(T)+")" for D in range(
 c20 = np.array([["c20(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
 c21 = np.array([["c21(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
 c22 = np.array([["c22(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
-constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22),axis=None).tolist()                          
+
+c23 = np.array([[["c23(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+c24 = np.array([[["c24(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+c25 = np.array([[["c25(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+c26 = np.array([[["c26(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+c27 = np.array([[["c27(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+c28 = np.array([[["c28(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+c29 = np.array([[["c29(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+c30 = np.array([[["c30(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+
+constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22,c23,c24,c25,c26,c27,c28,c29,c30),axis=None).tolist()                          
 
 #Defining the constraints
 
@@ -373,8 +405,98 @@ for T in range(1,t+1):
         constraint = [[xd,xd_num]]
         constraint_22.extend(constraint)
 
+
+constraint_23 = []
+for T in range(1,t+1):
+    for M in range(1,m+1):
+        for S in range(1,s+1):
+            var = [Nsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
+            coeff = [-1,1/cap_veh_sm]
+            constraint = [[var,coeff]]
+            constraint_23.extend(constraint)
+
+c23_rhs = 0*np.ones(len(c23.flatten()))
+
+constraint_24 = []
+for T in range(1,t+1):
+    for M in range(1,m+1):
+        for S in range(1,s+1):
+            var = [Nsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
+            coeff = [1,-1/cap_veh_sm]
+            constraint = [[var,coeff]]
+            constraint_24.extend(constraint)
+
+c24_rhs = ((cap_veh_sm-1)/cap_veh_sm)*np.ones(len(c24.flatten()))
+
+constraint_25 = []
+for T in range(1,t+1):
+    for S in range(1,s+1):
+        for R in range(1,r+1):
+            var = [Nrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
+            coeff = [-1,1/cap_veh_rs]
+            constraint = [[var,coeff]]
+            constraint_25.extend(constraint)
+
+c25_rhs = 0*np.ones(len(c25.flatten()))
+
+constraint_26 = []
+for T in range(1,t+1):
+    for S in range(1,s+1):
+        for R in range(1,r+1):
+            var = [Nrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
+            coeff = [1,-1/cap_veh_rs]
+            constraint = [[var,coeff]]
+            constraint_26.extend(constraint)
+
+c26_rhs = ((cap_veh_rs-1)/cap_veh_rs)*np.ones(len(c26.flatten()))
+
+constraint_27 = []
+for T in range(1,t+1):
+    for R in range(1,r+1):
+        for D in range(1,d+1):
+            var = [Ndrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
+            coeff = [-1,1/cap_veh_dr]
+            constraint = [[var,coeff]]
+            constraint_27.extend(constraint)
+
+c27_rhs = 0*np.ones(len(c27.flatten()))
+
+constraint_28 = []
+for T in range(1,t+1):
+    for R in range(1,r+1):
+        for D in range(1,d+1):
+            var = [Ndrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
+            coeff = [1,-1/cap_veh_dr]
+            constraint = [[var,coeff]]
+            constraint_28.extend(constraint)
+
+c28_rhs = ((cap_veh_dr-1)/cap_veh_dr)*np.ones(len(c28.flatten()))
+
+constraint_29 = []
+for T in range(1,t+1):
+    for D in range(1,d+1):
+        for I in range(1,i+1):
+            var = [Nidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
+            coeff = [-1,1/cap_veh_id]
+            constraint = [[var,coeff]]
+            constraint_29.extend(constraint)
+
+c29_rhs = 0*np.ones(len(c29.flatten()))
+
+constraint_30 = []
+for T in range(1,t+1):
+    for D in range(1,d+1):
+        for I in range(1,i+1):
+            var = [Nidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
+            coeff = [1,-1/cap_veh_id]
+            constraint = [[var,coeff]]
+            constraint_30.extend(constraint)
+
+c30_rhs = ((cap_veh_id-1)/cap_veh_id)*np.ones(len(c30.flatten()))
+
+
 constraints = []
-for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constraint_5,constraint_6,constraint_7,constraint_8,constraint_9,constraint_10,constraint_11,constraint_12,constraint_13,constraint_14,constraint_15,constraint_16,constraint_17,constraint_18,constraint_19,constraint_20,constraint_21,constraint_22]:
+for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constraint_5,constraint_6,constraint_7,constraint_8,constraint_9,constraint_10,constraint_11,constraint_12,constraint_13,constraint_14,constraint_15,constraint_16,constraint_17,constraint_18,constraint_19,constraint_20,constraint_21,constraint_22,constraint_23,constraint_24,constraint_25,constraint_26,constraint_27,constraint_28,constraint_29,constraint_30]:
     constraints.extend(constraint)
 
 
@@ -404,7 +526,7 @@ c20_rhs = np.ones(r*t);
 c21_rhs = np.ones(d*t);
 c22_rhs = np.ones(i*t);
 
-rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs,c12_rhs,c13_rhs,c14_rhs,c15_rhs,c16_rhs,c17_rhs,c18_rhs,c19_rhs,c20_rhs,c21_rhs,c22_rhs),axis=None).tolist()
+rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs,c12_rhs,c13_rhs,c14_rhs,c15_rhs,c16_rhs,c17_rhs,c18_rhs,c19_rhs,c20_rhs,c21_rhs,c22_rhs,c23_rhs,c24_rhs,c25_rhs,c26_rhs,c27_rhs,c28_rhs,c29_rhs,c30_rhs),axis=None).tolist()
 
 #Adding constraint senses
 l1 = np.array(["E" for g in range((s+r+d+i)*t)])
@@ -414,93 +536,94 @@ l4 = np.array(["L" for g in range((s+r+d+i)*t)])
 l5 = np.array(["L" for g in range(m*t)])
 l6 = np.array(["L" for g in range((m*s+s*r+r*d+d*i)*2*t)])
 l7 = np.array(["L" for g in range((r+d+i)*t)])
+l8 = np.array(["L" for g in range((m*s+s*r+r*d+d*i)*2*t)])
 
 
-constraint_senses = np.concatenate((l1,l2,l3,l4,l5,l6,l7),axis=None).tolist()
+constraint_senses = np.concatenate((l1,l2,l3,l4,l5,l6,l7,l8),axis=None).tolist()
 # print(len(constraint_names))
 # print(len(rhs))
 # print(len(constraint_senses))
 # print(len(constraints))
-# # And add the constraints
+# And add the constraints
 problem.linear_constraints.add(lin_expr = constraints,
                                senses = constraint_senses,
                                rhs = rhs,
                                names = constraint_names)
 
-# Solve the problem
+#Solve the problem
 problem.solve()
 sol = problem.solution.get_values()
 for x in range(len(sol)):
     print(names[x]," = ",round(sol[x]))
 
-workbook = xlsxwriter.Workbook('C:/Users/Ayush/Desktop/withConstraints.xlsx')
-worksheet = workbook.add_worksheet()
-merge_format = workbook.add_format({
-    'bold': 1,
-    'border': 1,
-    'align': 'center',
-    'valign': 'vcenter'})
+# workbook = xlsxwriter.Workbook('C:/Users/Ayush/Desktop/withConstraints.xlsx')
+# worksheet = workbook.add_worksheet()
+# merge_format = workbook.add_format({
+#     'bold': 1,
+#     'border': 1,
+#     'align': 'center',
+#     'valign': 'vcenter'})
 
-worksheet.merge_range('A1:B1', 'Inventory', merge_format)
-worksheet.merge_range('C1:D1', 'Consumption', merge_format)
-worksheet.merge_range('E1:F1', 'Shortage', merge_format)
-worksheet.merge_range('G1:H1', 'Delivery from M to S', merge_format)
-worksheet.merge_range('I1:J1', 'X from M to S', merge_format)
-worksheet.merge_range('K1:L1', 'Delivery from S to R', merge_format)
-worksheet.merge_range('M1:N1', 'X from S to R', merge_format)
-worksheet.merge_range('O1:P1', 'Delivery from R to D', merge_format)
-worksheet.merge_range('Q1:R1', 'X from R to D', merge_format)
-worksheet.merge_range('S1:T1', 'Delivery from D to I', merge_format)
-worksheet.merge_range('U1:V1', 'X from D to I', merge_format)
-x = 0
-y = 0
-z = 0
-row = 1
-col = 0
-for x in range((s+r+d+i)*t):
-    worksheet.write(row, col, names[x])
-    worksheet.write(row, col + 1, round(sol[x]))
-    row += 1
-row = 1
-for y in range(x+1,x+d*r*t+1):
-    worksheet.write(row, 14, names[y])
-    worksheet.write(row, 15, round(sol[y]))
-    worksheet.write(row, 16, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 17, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-    row +=1
-row = 1
-for z in range(y+1,y+s*m*t+1):
-    worksheet.write(row, 6, names[z])
-    worksheet.write(row, 7, round(sol[z]))
-    worksheet.write(row, 8, names[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 9, round(sol[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-    row +=1
-row = 1
-x = z
-for y in range(x+1,x+r*s*t+1):
-    worksheet.write(row, 10, names[y])
-    worksheet.write(row, 11, round(sol[y]))
-    worksheet.write(row, 12, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 13, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-    row +=1
-row = 1
-x = y
-for y in range(x+1,x+i*d*t+1):
-    worksheet.write(row, 18, names[y])
-    worksheet.write(row, 19, round(sol[y]))
-    worksheet.write(row, 20, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 21, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-    row +=1
-row = 1
-x = y
-for y in range(x+1,x+i*j*t+1):
-    worksheet.write(row, 4, names[y])
-    worksheet.write(row, 5, round(sol[y]))
-    row +=1
-row = 1
-x = y
-for y in range(x+1,x+i*j*t+1):
-    worksheet.write(row, 2, names[y])
-    worksheet.write(row, 3, round(sol[y]))
-    row +=1
-workbook.close()
+# worksheet.merge_range('A1:B1', 'Inventory', merge_format)
+# worksheet.merge_range('C1:D1', 'Consumption', merge_format)
+# worksheet.merge_range('E1:F1', 'Shortage', merge_format)
+# worksheet.merge_range('G1:H1', 'Delivery from M to S', merge_format)
+# worksheet.merge_range('I1:J1', 'X from M to S', merge_format)
+# worksheet.merge_range('K1:L1', 'Delivery from S to R', merge_format)
+# worksheet.merge_range('M1:N1', 'X from S to R', merge_format)
+# worksheet.merge_range('O1:P1', 'Delivery from R to D', merge_format)
+# worksheet.merge_range('Q1:R1', 'X from R to D', merge_format)
+# worksheet.merge_range('S1:T1', 'Delivery from D to I', merge_format)
+# worksheet.merge_range('U1:V1', 'X from D to I', merge_format)
+# x = 0
+# y = 0
+# z = 0
+# row = 1
+# col = 0
+# for x in range((s+r+d+i)*t):
+#     worksheet.write(row, col, names[x])
+#     worksheet.write(row, col + 1, round(sol[x]))
+#     row += 1
+# row = 1
+# for y in range(x+1,x+d*r*t+1):
+#     worksheet.write(row, 14, names[y])
+#     worksheet.write(row, 15, round(sol[y]))
+#     worksheet.write(row, 16, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+#     worksheet.write(row, 17, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+#     row +=1
+# row = 1
+# for z in range(y+1,y+s*m*t+1):
+#     worksheet.write(row, 6, names[z])
+#     worksheet.write(row, 7, round(sol[z]))
+#     worksheet.write(row, 8, names[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+#     worksheet.write(row, 9, round(sol[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+#     row +=1
+# row = 1
+# x = z
+# for y in range(x+1,x+r*s*t+1):
+#     worksheet.write(row, 10, names[y])
+#     worksheet.write(row, 11, round(sol[y]))
+#     worksheet.write(row, 12, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+#     worksheet.write(row, 13, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+#     row +=1
+# row = 1
+# x = y
+# for y in range(x+1,x+i*d*t+1):
+#     worksheet.write(row, 18, names[y])
+#     worksheet.write(row, 19, round(sol[y]))
+#     worksheet.write(row, 20, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+#     worksheet.write(row, 21, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+#     row +=1
+# row = 1
+# x = y
+# for y in range(x+1,x+i*j*t+1):
+#     worksheet.write(row, 4, names[y])
+#     worksheet.write(row, 5, round(sol[y]))
+#     row +=1
+# row = 1
+# x = y
+# for y in range(x+1,x+i*j*t+1):
+#     worksheet.write(row, 2, names[y])
+#     worksheet.write(row, 3, round(sol[y]))
+#     row +=1
+# workbook.close()
