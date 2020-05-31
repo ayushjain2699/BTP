@@ -18,9 +18,9 @@ t = 4  #Time sub index
 
 nc = (s+d+r+i)*t+(d*r+s*m+r*s+i*d)*t+2*i*j*t #Total number of continuous variables
 nb = (d*r+s*m+r*s+i*d)*t #Total number of binary variables
-ty = problem.variables.type
-type_c = np.array([ty.integer for NC in range(nc)])
-type_b = np.array([ty.binary for NB in range(nb)])
+
+type_c = np.array(["I" for NC in range(nc)])
+type_b = np.array(["B" for NB in range(nb)])
 types = np.concatenate((type_c,type_b),axis = None)
 
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
@@ -93,10 +93,10 @@ for T in range(t):
     hit[T][9] = 0.50
 
 #Ordering costs
-Csmt = [[[25000 for S in range(s)] for M in range(m)] for T in range(t)]
-Crst = [[[25000 for R in range(r)] for S in range(s)] for T in range(t)]
-Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
-Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
+Csmt = [[[2500000 for S in range(s)] for M in range(m)] for T in range(t)]
+Crst = [[[2500000 for R in range(r)] for S in range(s)] for T in range(t)]
+Cdrt = [[[2500000 for D in range(d)] for R in range(r)] for T in range(t)]
+Cidt = [[[2500000 for I in range(i)] for D in range(d)] for T in range(t)]
 # # The obective function. More precisely, the coefficients of the objective function. 
 objective = np.concatenate((hst,hrt,hdt,hit,np.array(Ksm*t),np.array(Krs*t),np.array(Kdr*t),np.array(Kid*t),Pjt_obj,np.array([0]*len(wijt.flatten())),Cdrt,Csmt,Crst,Cidt),axis=None)
 #print(objective)
