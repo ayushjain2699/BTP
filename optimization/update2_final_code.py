@@ -1,16 +1,13 @@
-# And print the solutions
-#print(problem.solution.get_values())
-#/usr/bin/env python3
-
 import cplex
 import numpy as np
 import xlsxwriter
+
 # Create an instance of a linear problem to solve
 problem = cplex.Cplex()
 
 # We want to find a minimum of our objective function
 problem.objective.set_sense(problem.objective.sense.minimize)
-#test
+
 j = 2  #Customer sub index
 m = 3  #Manufacturer sub index
 s = 1  #State sub index
@@ -69,21 +66,25 @@ Dsm = np.random.normal(1000,250,s*m).reshape(m,s)
 Drs = np.random.normal(400,75,r*s).reshape(s,r)
 Ddr = np.random.normal(200,25,d*r).reshape(r,d)
 Did = np.random.normal(100,25,d*i).reshape(d,i)
+
+Dsm_name = np.array([["D(s,m)("+str(S)+","+str(M)+")" for S in range(1,s+1)] for M in range(1,m+1)]) 
+Drs_name = np.array([["D(r,s)("+str(R)+","+str(S)+")" for R in range(1,r+1)] for S in range(1,s+1)])
+Ddr_name = np.array([["D(d,r)("+str(D)+","+str(R)+")" for D in range(1,d+1)] for R in range(1,r+1)])
+Did_name = np.array([["D(i,d)("+str(I)+","+str(D)+")" for I in range(1,i+1)] for D in range(1,d+1)])
+
+distances = np.concatenate((Dsm,Drs,Ddr,Did),axis=None).tolist()
+D_names = np.concatenate((Dsm_name,Drs_name,Ddr_name,Did_name),axis=None).tolist()
+
 cap_veh_sm = 5000 
 cap_veh_rs = 3000
 cap_veh_dr = 3000
 cap_veh_id = 1000
 
+#Transportation costs
 Ksmt = np.array([[[Dsm[M][S]*diesel_cost+booking_cost for S in range(0,s)] for M in range(0,m)] for T in range(0,t)])
 Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
 Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost for D in range(0,d)] for R in range(0,r)] for T in range(0,t)])
 Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
-# Ksm = [[3],[2.5],[5]]   
-# Krs = [0.3,0.4,0.37]
-# #Kdr = [[0.4,0.5,0.45],[0.8,0.75,0.78],[0.9,0.85,0.88],[0.4,0.55,0.51],[0.33,0.61,0.44]]
-# Kdr = [[0.4,0.8,0.9,0.4,0.33],[0.5,0.75,0.85,0.55,0.61],[0.45,0.78,0.88,0.51,0.44]]
-# #Kid = [[0.43,0.51,0.49,0.51,0.52],[0.79,0.77,0.78,0.72,0.71],[0.35,0.33,0.43,0.35,0.46],[1.07,1.07,1.11,1.12,1.12],[0.87,0.87,0.87,0.87,0.87],[0.36,0.43,0.4,0.42,0.38],[1.11,1.18,1.14,1.21,1.16],[0.95,0.92,0.94,0.98,0.99],[0.7,0.66,0.61,0.63,0.58],[0.92,0.93,0.95,0.89,1]]
-# Kid = [[0.43,0.79,0.35,1.07,0.87,0.36,1.11,0.95,0.7,0.92],[0.51,0.77,0.33,1.07,0.87,0.43,1.18,0.92,0.66,0.93],[0.49,0.78,0.43,1.11,0.87,0.4,1.41,0.94,0.61,0.95],[0.51,0.72,0.35,1.12,0.87,0.42,1.21,0.98,0.63,0.89],[0.52,0.71,0.46,1.12,0.87,0.38,1.16,0.99,0.58,1]]
 
 #Shortage costs
 Pjt = [[0 for J in range(j)] for T in range(t)]
@@ -140,7 +141,7 @@ problem.variables.add(obj = objective,
                       names = names.tolist(),
                       types = types)
 
-# # Constraints
+# Constraints
 
 #Inventory balance equations
 c1 = np.array([["c1(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
@@ -542,11 +543,7 @@ l8 = np.array(["L" for g in range((m*s+s*r+r*d+d*i)*2*t)])
 
 
 constraint_senses = np.concatenate((l1,l2,l3,l4,l5,l6,l7,l8),axis=None).tolist()
-# print(len(constraint_names))
-# print(len(rhs))
-# print(len(constraint_senses))
-# print(len(constraints))
-# And add the constraints
+
 problem.linear_constraints.add(lin_expr = constraints,
                                senses = constraint_senses,
                                rhs = rhs,
@@ -558,74 +555,137 @@ sol = problem.solution.get_values()
 for x in range(len(sol)):
     print(names[x]," = ",round(sol[x]))
 
-# workbook = xlsxwriter.Workbook('C:/Users/Ayush/Desktop/withConstraints.xlsx')
-# worksheet = workbook.add_worksheet()
-# merge_format = workbook.add_format({
-#     'bold': 1,
-#     'border': 1,
-#     'align': 'center',
-#     'valign': 'vcenter'})
+workbook = xlsxwriter.Workbook('C:/Users/SHANMUKHI/Desktop/withConstraints.xlsx')
+worksheet = workbook.add_worksheet()
+merge_format = workbook.add_format({
+    'bold': 1,
+    'border': 1,
+    'align': 'center',
+    'valign': 'vcenter'})
 
-# worksheet.merge_range('A1:B1', 'Inventory', merge_format)
-# worksheet.merge_range('C1:D1', 'Consumption', merge_format)
-# worksheet.merge_range('E1:F1', 'Shortage', merge_format)
-# worksheet.merge_range('G1:H1', 'Delivery from M to S', merge_format)
-# worksheet.merge_range('I1:J1', 'X from M to S', merge_format)
-# worksheet.merge_range('K1:L1', 'Delivery from S to R', merge_format)
-# worksheet.merge_range('M1:N1', 'X from S to R', merge_format)
-# worksheet.merge_range('O1:P1', 'Delivery from R to D', merge_format)
-# worksheet.merge_range('Q1:R1', 'X from R to D', merge_format)
-# worksheet.merge_range('S1:T1', 'Delivery from D to I', merge_format)
-# worksheet.merge_range('U1:V1', 'X from D to I', merge_format)
-# x = 0
-# y = 0
-# z = 0
-# row = 1
-# col = 0
-# for x in range((s+r+d+i)*t):
-#     worksheet.write(row, col, names[x])
-#     worksheet.write(row, col + 1, round(sol[x]))
-#     row += 1
-# row = 1
-# for y in range(x+1,x+d*r*t+1):
-#     worksheet.write(row, 14, names[y])
-#     worksheet.write(row, 15, round(sol[y]))
-#     worksheet.write(row, 16, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-#     worksheet.write(row, 17, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-#     row +=1
-# row = 1
-# for z in range(y+1,y+s*m*t+1):
-#     worksheet.write(row, 6, names[z])
-#     worksheet.write(row, 7, round(sol[z]))
-#     worksheet.write(row, 8, names[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-#     worksheet.write(row, 9, round(sol[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-#     row +=1
-# row = 1
-# x = z
-# for y in range(x+1,x+r*s*t+1):
-#     worksheet.write(row, 10, names[y])
-#     worksheet.write(row, 11, round(sol[y]))
-#     worksheet.write(row, 12, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-#     worksheet.write(row, 13, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-#     row +=1
-# row = 1
-# x = y
-# for y in range(x+1,x+i*d*t+1):
-#     worksheet.write(row, 18, names[y])
-#     worksheet.write(row, 19, round(sol[y]))
-#     worksheet.write(row, 20, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
-#     worksheet.write(row, 21, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
-#     row +=1
-# row = 1
-# x = y
-# for y in range(x+1,x+i*j*t+1):
-#     worksheet.write(row, 4, names[y])
-#     worksheet.write(row, 5, round(sol[y]))
-#     row +=1
-# row = 1
-# x = y
-# for y in range(x+1,x+i*j*t+1):
-#     worksheet.write(row, 2, names[y])
-#     worksheet.write(row, 3, round(sol[y]))
-#     row +=1
-# workbook.close()
+worksheet.merge_range('A1:B1', 'Inventory', merge_format)
+worksheet.merge_range('C1:D1', 'Consumption', merge_format)
+worksheet.merge_range('E1:F1', 'Shortage', merge_format)
+worksheet.merge_range('G1:H1', 'Delivery from M to S', merge_format)
+worksheet.merge_range('I1:J1', 'X from M to S', merge_format)
+worksheet.merge_range('K1:L1', 'No of Trucks from M to S', merge_format)
+worksheet.merge_range('M1:N1', 'Distance from M to S', merge_format)
+worksheet.merge_range('O1:P1', 'Delivery from S to R', merge_format)
+worksheet.merge_range('Q1:R1', 'X from S to R', merge_format)
+worksheet.merge_range('S1:T1', 'No of Trucks from S to R', merge_format)
+worksheet.merge_range('U1:V1', 'Distance from S to R', merge_format)
+worksheet.merge_range('W1:X1', 'Delivery from R to D', merge_format)
+worksheet.merge_range('Y1:Z1', 'X from R to D', merge_format)
+worksheet.merge_range('AA1:AB1', 'No of Trucks from R to D', merge_format)
+worksheet.merge_range('AC1:AD1', 'Distance from R to D', merge_format)
+worksheet.merge_range('AE1:AF1', 'Delivery from D to I', merge_format)
+worksheet.merge_range('AG1:AH1', 'X from D to I', merge_format)
+worksheet.merge_range('AI1:AJ1', 'No of Trucks from D to I', merge_format)
+worksheet.merge_range('AK1:AL1', 'Distance from D to I', merge_format)
+
+x = 0
+y = 0
+z = 0
+row = 1
+col = 0
+
+#Inventory
+for x in range((s+r+d+i)*t):
+    worksheet.write(row, col, names[x])
+    worksheet.write(row, col + 1, round(sol[x]))
+    row += 1
+
+#Qdrt, Xdrt, Ndrt
+row = 1
+for y in range(x+1,x+d*r*t+1):
+    worksheet.write(row, 22, names[y])
+    worksheet.write(row, 23, round(sol[y]))
+    worksheet.write(row, 24, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+    worksheet.write(row, 25, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+    worksheet.write(row, 26, names[y+2*(d*r+s*m+r*s+i*d)*t+2*i*j*t+s*m*t+r*s*t])
+    worksheet.write(row, 27, round(sol[y+2*(d*r+s*m+r*s+i*d)*t+2*i*j*t+s*m*t+r*s*t]))
+    row +=1
+
+#Qsmt,Xsmt,Nsmt
+row = 1
+for z in range(y+1,y+s*m*t+1):
+    worksheet.write(row, 6, names[z])
+    worksheet.write(row, 7, round(sol[z]))
+    worksheet.write(row, 8, names[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+    worksheet.write(row, 9, round(sol[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+    worksheet.write(row, 10, names[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t+i*d*t+s*m*t+r*s*t])
+    worksheet.write(row, 11, round(sol[z+(d*r+s*m+r*s+i*d)*t+2*i*j*t+i*d*t+s*m*t+r*s*t]))
+    row +=1
+
+#Qrst,Xrst,Nrst
+row = 1
+x = z
+for y in range(x+1,x+r*s*t+1):
+    worksheet.write(row, 14, names[y])
+    worksheet.write(row, 15, round(sol[y]))
+    worksheet.write(row, 16, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+    worksheet.write(row, 17, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+    worksheet.write(row, 18, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t+i*d*t+s*m*t+r*s*t])
+    worksheet.write(row, 19, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t+i*d*t+s*m*t+r*s*t]))
+    row +=1
+
+#Qidt,Xidt,Nidt
+row = 1
+x = y
+for y in range(x+1,x+i*d*t+1):
+    worksheet.write(row, 30, names[y])
+    worksheet.write(row, 31, round(sol[y]))
+    worksheet.write(row, 32, names[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+    worksheet.write(row, 33, round(sol[y+(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+    worksheet.write(row, 34, names[y+2*(d*r+s*m+r*s+i*d)*t+2*i*j*t])
+    worksheet.write(row, 35, round(sol[y+2*(d*r+s*m+r*s+i*d)*t+2*i*j*t]))
+    row +=1
+
+#Shortage
+row = 1
+x = y
+for y in range(x+1,x+i*j*t+1):
+    worksheet.write(row, 4, names[y])
+    worksheet.write(row, 5, round(sol[y]))
+    row +=1
+
+#Consumption
+row = 1
+x = y
+for y in range(x+1,x+i*j*t+1):
+    worksheet.write(row, 2, names[y])
+    worksheet.write(row, 3, round(sol[y]))
+    row +=1
+
+#Distances from M to S
+row = 1
+for y in range(s*m):
+    worksheet.write(row, 12, D_names[y])
+    worksheet.write(row, 13, distances[y])
+    row +=1
+
+#Distances from S to R
+row = 1
+x = y
+for y in range(x+1,x+s*r+1):
+    worksheet.write(row, 20, D_names[y])
+    worksheet.write(row, 21, distances[y])
+    row +=1
+
+#Distances from R to D
+row = 1
+x = y
+for y in range(x+1,x+d*r+1):
+    worksheet.write(row, 28, D_names[y])
+    worksheet.write(row, 29, distances[y])
+    row +=1
+
+#Distances from D to I
+row = 1
+x = y
+for y in range(x+1,x+d*i+1):
+    worksheet.write(row, 36, D_names[y])
+    worksheet.write(row, 37, distances[y])
+    row +=1
+
+workbook.close()
