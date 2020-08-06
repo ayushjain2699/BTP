@@ -13,18 +13,19 @@ problem.objective.set_sense(problem.objective.sense.minimize)
 #test
 j = 2  #Customer sub index
 m = 3  #Manufacturer sub index
+g = 1  #GMSD index
 s = 1  #State sub index
 r = 3  #Region sub index
 d = 5  #District sub index
 i = 10 #Clinic sub index
 t = 4  #Time sub index
 
-nc = (s+d+r+i)*t+(d*r+s*m+r*s+i*d)*t+2*i*j*t #Total number of continuous variables
-nb = (d*r+s*m+r*s+i*d)*t #Total number of binary variables
+nc = (g+s+d+r+i)*t+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t #Total number of continuous variables
+nb = (g*m+d*r+s*g+r*s+i*d)*t #Total number of binary variables
 
 type_c = np.array(["I" for NC in range(nc)])
 type_b = np.array(["B" for NB in range(nb)])
-type_for_N = np.array(["I" for KK in range((s*m+r*s+d*r+i*d)*t)])
+type_for_N = np.array(["I" for KK in range((g*m+s*g+r*s+d*r+i*d)*t)])
 types = np.concatenate((type_c,type_b,type_for_N),axis = None)
 
 #It has been stored time wise. For a given time, we placed all the respective centers adjacently. 
@@ -36,47 +37,54 @@ types = np.concatenate((type_c,type_b,type_for_N),axis = None)
 
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
+Igt = np.array([["I(g,t)("+str(G)+","+str(T)+")" for G in range(1,g+1)] for T in range(1,t+1)]) 
 Ist = np.array([["I(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)]) 
 Irt = np.array([["I(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
 Idt = np.array([["I(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
 Iit = np.array([["I(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
 
-qdrt = np.array([[["q(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
-qsmt = np.array([[["q(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+qgmt = np.array([[["q(g,m,t)("+str(G)+","+str(M)+","+str(T)+")" for G in range(1,g+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+qsgt = np.array([[["q(s,g,t)("+str(S)+","+str(G)+","+str(T)+")" for S in range(1,s+1)] for G in range(1,g+1)] for T in range(1,t+1)])
 qrst = np.array([[["q(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+qdrt = np.array([[["q(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
 qidt = np.array([[["q(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
 
 sijt = np.array([[["s(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
 wijt = np.array([[["w(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
 
-Xdrt = np.array([[["X(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
-Xsmt = np.array([[["X(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+Xgmt = np.array([[["X(g,m,t)("+str(G)+","+str(M)+","+str(T)+")" for G in range(1,g+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+Xsgt = np.array([[["X(s,g,t)("+str(S)+","+str(G)+","+str(T)+")" for S in range(1,s+1)] for G in range(1,g+1)] for T in range(1,t+1)])
 Xrst = np.array([[["X(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+Xdrt = np.array([[["X(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
 Xidt = np.array([[["X(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
 
-Nsmt = np.array([[["N(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+Ngmt = np.array([[["N(g,m,t)("+str(G)+","+str(M)+","+str(T)+")" for G in range(1,g+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+Nsgt = np.array([[["N(s,g,t)("+str(S)+","+str(G)+","+str(T)+")" for S in range(1,s+1)] for G in range(1,g+1)] for T in range(1,t+1)])
 Nrst = np.array([[["N(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
 Ndrt = np.array([[["N(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
 Nidt = np.array([[["N(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
     
-names = np.concatenate((Ist,Irt,Idt,Iit,qdrt,qsmt,qrst,qidt,sijt,wijt,Xdrt,Xsmt,Xrst,Xidt,Nsmt,Nrst,Ndrt,Nidt),axis=None)
+names = np.concatenate((Igt,Ist,Irt,Idt,Iit,qgmt,qsgt,qrst,qdrt,qidt,sijt,wijt,Xgmt,Xsgt,Xrst,Xdrt,Xidt,Ngmt,Nsgt,Nrst,Ndrt,Nidt),axis=None)
 
 #Transportation cost per unit
 diesel_cost = 14
 booking_cost = 10000
 np.random.seed(133)
 
-Dsm = np.random.normal(1000,250,s*m).reshape(m,s)
+Dgm = np.random.normal(1000,250,g*m).reshape(m,g)
+Dsg = np.random.normal(1000,250,s*g).reshape(g,s)
 Drs = np.random.normal(400,75,r*s).reshape(s,r)
 Ddr = np.random.normal(200,25,d*r).reshape(r,d)
 Did = np.random.normal(100,25,d*i).reshape(d,i)
 
-cap_veh_sm = 5000 
+cap_veh_gm = 5000
+cap_veh_sg = 5000 
 cap_veh_rs = 3000
 cap_veh_dr = 3000
 cap_veh_id = 1000
 
-Ksmt = np.array([[[Dsm[M][S]*diesel_cost+booking_cost for S in range(0,s)] for M in range(0,m)] for T in range(0,t)])
+Kgmt = np.array([[[Dgm[M][G]*diesel_cost+booking_cost for G in range(0,g)] for M in range(0,m)] for T in range(0,t)])
+Ksgt = np.array([[[Dsg[G][S]*diesel_cost+booking_cost for S in range(0,s)] for G in range(0,g)] for T in range(0,t)])
 Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
 Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost for D in range(0,d)] for R in range(0,r)] for T in range(0,t)])
 Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
@@ -96,10 +104,11 @@ for T in range(t):
 Pjt_obj = np.array([[[Pjt[T][J] for I in range(i)] for J in range(j)] for T in range(t)])
 
 #Inventory holding costs
+hgt = [[0.3],[0.3],[0.3],[0.3]] 
+hst = [[0.3],[0.3],[0.3],[0.3]] 
 hrt = [[0 for R in range(r)] for T in range(t)]
 hdt = [[0 for D in range(d)] for T in range(t)]
 hit = [[0 for I in range(i)] for T in range(t)]
-hst = [[0.3],[0.3],[0.3],[0.3]] 
 for T in range(t):
     hrt[T][0] = 0.3
     hrt[T][1] = 0.4
@@ -123,12 +132,13 @@ for T in range(t):
     hit[T][9] = 0.50
 
 #Ordering costs
-Csmt = [[[25000 for S in range(s)] for M in range(m)] for T in range(t)]
+Cgmt = [[[25000 for G in range(g)] for M in range(m)] for T in range(t)]
+Csgt = [[[25000 for S in range(s)] for G in range(g)] for T in range(t)]
 Crst = [[[25000 for R in range(r)] for S in range(s)] for T in range(t)]
 Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
 Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
 # # The obective function. More precisely, the coefficients of the objective function. 
-objective = np.concatenate((hst,hrt,hdt,hit,np.zeros(s*m*t),np.zeros(r*s*t),np.zeros(d*r*t),np.zeros(i*d*t),Pjt_obj,np.array([0]*len(wijt.flatten())),Cdrt,Csmt,Crst,Cidt,Ksmt,Krst,Kdrt,Kidt),axis=None)
+objective = np.concatenate((hgt,hst,hrt,hdt,hit,np.zeros(g*m*t),np.zeros(s*g*t),np.zeros(r*s*t),np.zeros(d*r*t),np.zeros(i*d*t),Pjt_obj,np.array([0]*len(wijt.flatten())),Cgmt,Csgt,Crst,Cdrt,Cidt,Kgmt,Ksgt,Krst,Kdrt,Kidt),axis=None)
 #print(objective)
 
 # # Lower bounds. Since these are all zero, we could simply not pass them in as all zeroes is the default.
@@ -146,52 +156,99 @@ problem.variables.add(obj = objective,
 # # Constraints
 
 #Inventory balance equations
-c1 = np.array([["c1(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
-c2 = np.array([["c2(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
-c3 = np.array([["c3(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
-c4 = np.array([["c4(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
+c1 = np.array([["c1(g,t)("+str(G)+","+str(T)+")" for G in range(1,s+1)] for T in range(1,t+1)])
+c2 = np.array([["c2(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
+c3 = np.array([["c3(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
+c4 = np.array([["c4(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
+c5 = np.array([["c5(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
 
 #Consumption bounded by demand
-c5 = np.array([[["c5(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
-
-#Consumption balance
 c6 = np.array([[["c6(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
 
+#Consumption balance
+c7 = np.array([[["c7(i,j,t)("+str(I)+","+str(J)+","+str(T)+")" for I in range(1,i+1)] for J in range(1,j+1)] for T in range(1,t+1)])
+
 #Inventory capacity constraints
-c7 = np.array([["c7(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
-c8 = np.array([["c8(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
-c9 = np.array([["c9(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
-c10 = np.array([["c10(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
+c8 = np.array([["c8(g,t)("+str(G)+","+str(T)+")" for G in range(1,g+1)] for T in range(1,t+1)])
+c9 = np.array([["c9(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
+c10 = np.array([["c10(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
+c11 = np.array([["c11(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
+c12 = np.array([["c12(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
 
 #Production capacity constraints at manufacturer end
-c11 = np.array([["c11(m,t)("+str(M)+","+str(T)+")" for M in range(1,m+1)] for T in range(1,t+1)])
+c13 = np.array([["c13(m,t)("+str(M)+","+str(T)+")" for M in range(1,m+1)] for T in range(1,t+1)])
 
-c12 = np.array([[["c12(m,s,t)("+str(M)+","+str(S)+","+str(T)+")" for M in range(1,m+1)] for S in range(1,s+1)] for T in range(1,t+1)])
-c13 = np.array([[["c13(m,s,t)("+str(M)+","+str(S)+","+str(T)+")" for M in range(1,m+1)] for S in range(1,s+1)] for T in range(1,t+1)])
-c14 = np.array([[["c14(s,r,t)("+str(S)+","+str(R)+","+str(T)+")" for S in range(1,s+1)] for R in range(1,r+1)] for T in range(1,t+1)])
-c15 = np.array([[["c15(s,r,t)("+str(S)+","+str(R)+","+str(T)+")" for S in range(1,s+1)] for R in range(1,r+1)] for T in range(1,t+1)])
-c16 = np.array([[["c16(r,d,t)("+str(R)+","+str(D)+","+str(T)+")" for R in range(1,r+1)] for D in range(1,d+1)] for T in range(1,t+1)])
-c17 = np.array([[["c17(r,d,t)("+str(R)+","+str(D)+","+str(T)+")" for R in range(1,r+1)] for D in range(1,d+1)] for T in range(1,t+1)])
-c18 = np.array([[["c18(d,i,t)("+str(D)+","+str(I)+","+str(T)+")" for D in range(1,d+1)] for I in range(1,i+1)] for T in range(1,t+1)])
-c19 = np.array([[["c19(d,i,t)("+str(D)+","+str(I)+","+str(T)+")" for D in range(1,d+1)] for I in range(1,i+1)] for T in range(1,t+1)])
-c20 = np.array([["c20(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
-c21 = np.array([["c21(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
-c22 = np.array([["c22(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
+#Facility selection constraints
+c14 = np.array([["c14(s,t)("+str(S)+","+str(T)+")" for S in range(1,s+1)] for T in range(1,t+1)])
+c15 = np.array([["c15(r,t)("+str(R)+","+str(T)+")" for R in range(1,r+1)] for T in range(1,t+1)])
+c16 = np.array([["c16(d,t)("+str(D)+","+str(T)+")" for D in range(1,d+1)] for T in range(1,t+1)])
+c17 = np.array([["c17(i,t)("+str(I)+","+str(T)+")" for I in range(1,i+1)] for T in range(1,t+1)])
 
-c23 = np.array([[["c23(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
-c24 = np.array([[["c24(s,m,t)("+str(S)+","+str(M)+","+str(T)+")" for S in range(1,s+1)] for M in range(1,m+1)] for T in range(1,t+1)])
-c25 = np.array([[["c25(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
-c26 = np.array([[["c26(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
-c27 = np.array([[["c27(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
-c28 = np.array([[["c28(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
-c29 = np.array([[["c29(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
-c30 = np.array([[["c30(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+#To ensure Consistency of X and q
+c18 = np.array([[["c18(m,g,t)("+str(M)+","+str(G)+","+str(T)+")" for M in range(1,m+1)] for G in range(1,g+1)] for T in range(1,t+1)])
+c19 = np.array([[["c19(m,g,t)("+str(M)+","+str(G)+","+str(T)+")" for M in range(1,m+1)] for G in range(1,g+1)] for T in range(1,t+1)])
+c20 = np.array([[["c20(g,s,t)("+str(G)+","+str(S)+","+str(T)+")" for G in range(1,g+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+c21 = np.array([[["c21(g,s,t)("+str(G)+","+str(S)+","+str(T)+")" for G in range(1,g+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+c22 = np.array([[["c22(s,r,t)("+str(S)+","+str(R)+","+str(T)+")" for S in range(1,s+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+c23 = np.array([[["c23(s,r,t)("+str(S)+","+str(R)+","+str(T)+")" for S in range(1,s+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+c24 = np.array([[["c24(r,d,t)("+str(R)+","+str(D)+","+str(T)+")" for R in range(1,r+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+c25 = np.array([[["c25(r,d,t)("+str(R)+","+str(D)+","+str(T)+")" for R in range(1,r+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+c26 = np.array([[["c26(d,i,t)("+str(D)+","+str(I)+","+str(T)+")" for D in range(1,d+1)] for I in range(1,i+1)] for T in range(1,t+1)])
+c27 = np.array([[["c27(d,i,t)("+str(D)+","+str(I)+","+str(T)+")" for D in range(1,d+1)] for I in range(1,i+1)] for T in range(1,t+1)])
 
-constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22,c23,c24,c25,c26,c27,c28,c29,c30),axis=None).tolist()                          
+#Number of trucks constraints
+c28 = np.array([[["c28(g,m,t)("+str(G)+","+str(M)+","+str(T)+")" for G in range(1,g+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+c29 = np.array([[["c29(g,m,t)("+str(G)+","+str(M)+","+str(T)+")" for G in range(1,g+1)] for M in range(1,m+1)] for T in range(1,t+1)])
+c30 = np.array([[["c30(s,g,t)("+str(S)+","+str(G)+","+str(T)+")" for S in range(1,s+1)] for G in range(1,g+1)] for T in range(1,t+1)])
+c31 = np.array([[["c31(s,g,t)("+str(S)+","+str(G)+","+str(T)+")" for S in range(1,s+1)] for G in range(1,g+1)] for T in range(1,t+1)])
+c32 = np.array([[["c32(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+c33 = np.array([[["c33(r,s,t)("+str(R)+","+str(S)+","+str(T)+")" for R in range(1,r+1)] for S in range(1,s+1)] for T in range(1,t+1)])
+c34 = np.array([[["c34(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+c35 = np.array([[["c35(d,r,t)("+str(D)+","+str(R)+","+str(T)+")" for D in range(1,d+1)] for R in range(1,r+1)] for T in range(1,t+1)])
+c36 = np.array([[["c36(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+c37 = np.array([[["c37(i,d,t)("+str(I)+","+str(D)+","+str(T)+")" for I in range(1,i+1)] for D in range(1,d+1)] for T in range(1,t+1)])
+
+constraint_names = np.concatenate((c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22,c23,c24,c25,c26,c27,c28,c29,c30,c31,c32,c33,c34,c35,c36,c37),axis=None).tolist()                          
 
 #Defining the constraints
 
+constraint_1 = []
+for T in range(1,t+1):
+    for G in range(1,g+1):
+
+        if(T==1):
+            I = np.array([Igt[T-1][G-1]])
+        else:
+            I = np.array([Igt[T-2][G-1],Igt[T-1][G-1]])
+        qm = np.array([qgmt[T-1][M-1][G-1] for M in range(1,m+1)])
+        qs = np.array([qsgt[T-1][G-1][S-1] for S in range(1,s+1)])
+        list1 = np.concatenate((I,qm,qs),axis=None).tolist()
+        if(T==1):
+            list2 = np.concatenate((np.array([-1]),np.ones(m),-1*np.ones(s)),axis=None).tolist()
+        else:
+            list2 = np.concatenate((np.array([1,-1]),np.ones(m),-1*np.ones(s)),axis=None).tolist()
+        constraint = [[list1,list2]]
+        constraint_1.extend(constraint)
+
 constraint_2 = []
+for T in range(1,t+1):
+    for S in range(1,s+1):
+
+        if(T==1):
+            I = np.array([Ist[T-1][S-1]])
+        else:
+            I = np.array([Ist[T-2][S-1],Ist[T-1][S-1]])
+        qg = np.array([qsgt[T-1][G-1][S-1] for G in range(1,g+1)])
+        qr = np.array([qrst[T-1][S-1][R-1] for R in range(1,r+1)])
+        list1 = np.concatenate((I,qg,qr),axis=None).tolist()
+        if(T==1):
+            list2 = np.concatenate((np.array([-1]),np.ones(g),-1*np.ones(r)),axis=None).tolist()
+        else:
+            list2 = np.concatenate((np.array([1,-1]),np.ones(g),-1*np.ones(r)),axis=None).tolist()
+        constraint = [[list1,list2]]
+        constraint_2.extend(constraint)
+
+constraint_3 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
 
@@ -207,27 +264,9 @@ for T in range(1,t+1):
         else:
             list2 = np.concatenate((np.array([1,-1]),np.ones(s),-1*np.ones(d)),axis=None).tolist()
         constraint = [[list1,list2]]
-        constraint_2.extend(constraint)
+        constraint_3.extend(constraint)
 
-constraint_1 = []
-for T in range(1,t+1):
-    for S in range(1,s+1):
-
-        if(T==1):
-            I = np.array([Ist[T-1][S-1]])
-        else:
-            I = np.array([Ist[T-2][S-1],Ist[T-1][S-1]])
-        qm = np.array([qsmt[T-1][M-1][S-1] for M in range(1,m+1)])
-        qr = np.array([qrst[T-1][S-1][R-1] for R in range(1,r+1)])
-        list1 = np.concatenate((I,qm,qr),axis=None).tolist()
-        if(T==1):
-            list2 = np.concatenate((np.array([-1]),np.ones(m),-1*np.ones(r)),axis=None).tolist()
-        else:
-            list2 = np.concatenate((np.array([1,-1]),np.ones(m),-1*np.ones(r)),axis=None).tolist()
-        constraint = [[list1,list2]]
-        constraint_1.extend(constraint)
-
-constraint_3 = []
+constraint_4 = []
 for T in range(1,t+1):
     for D in range(1,d+1):
 
@@ -243,9 +282,9 @@ for T in range(1,t+1):
         else:
             list2 = np.concatenate((np.array([1,-1]),np.ones(r),-1*np.ones(i)),axis=None).tolist()
         constraint = [[list1,list2]]
-        constraint_3.extend(constraint)
+        constraint_4.extend(constraint)
 
-constraint_4 = []
+constraint_5 = []
 for T in range(1,t+1):
     for I in range(1,i+1):
 
@@ -261,247 +300,301 @@ for T in range(1,t+1):
         else:
             list2 = np.concatenate((np.array([1,-1]),np.ones(d),-1*np.ones(j)),axis=None).tolist()
         constraint = [[list1,list2]]
-        constraint_4.extend(constraint)
+        constraint_5.extend(constraint)
 
 
-constraint_5 = []
+constraint_6 = []
 for T in range(1,t+1):
     for J in range(1,j+1):
         for I in range(1,i+1):
             w=[[[wijt[T-1][J-1][I-1]],[1.0]]]
-            constraint_5.extend(w)
+            constraint_6.extend(w)
 
-constraint_6 = []
+constraint_7 = []
 for T in range(1,t+1):
     for J in range(1,j+1):
         for I in range(1,i+1):
             list1=[wijt[T-1][J-1][I-1],sijt[T-1][J-1][I-1]]
             list2=[1.0,1.0]
             constraint=[[list1,list2]]
-            constraint_6.extend(constraint)
-
-constraint_7 = []
-for T in range(1,t+1):
-    for S in range(1,s+1):
-        w=[[[Ist[T-1][S-1]],[1.0]]]
-        constraint_7.extend(w)
+            constraint_7.extend(constraint)
 
 constraint_8 = []
 for T in range(1,t+1):
-    for R in range(1,r+1):
-        w=[[[Irt[T-1][R-1]],[1.0]]]
+    for G in range(1,g+1):
+        w=[[[Igt[T-1][G-1]],[1.0]]]
         constraint_8.extend(w)
 
 constraint_9 = []
 for T in range(1,t+1):
-    for D in range(1,d+1):
-        w=[[[Idt[T-1][D-1]],[1.0]]]
+    for S in range(1,s+1):
+        w=[[[Ist[T-1][S-1]],[1.0]]]
         constraint_9.extend(w)
 
 constraint_10 = []
 for T in range(1,t+1):
-    for I in range(1,i+1):
-        w=[[[Iit[T-1][I-1]],[1.0]]]
+    for R in range(1,r+1):
+        w=[[[Irt[T-1][R-1]],[1.0]]]
         constraint_10.extend(w)
 
 constraint_11 = []
 for T in range(1,t+1):
-    for M in range(1,m+1):
-        qs = np.array([qsmt[T-1][M-1][S-1] for S in range(1,s+1)]).tolist()
-        qs_num = np.ones(s).tolist()
-        constraint = [[qs,qs_num]]
-        constraint_11.extend(constraint)
-
-INF = cplex.infinity;
+    for D in range(1,d+1):
+        w=[[[Idt[T-1][D-1]],[1.0]]]
+        constraint_11.extend(w)
 
 constraint_12 = []
 for T in range(1,t+1):
-    for S in range(1,s+1):
-        for M in range(1,m+1):
-            var = [Xsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
-            coeff = [1,-INF]
-            constraint = [[var,coeff]]
-            constraint_12.extend(constraint)
+    for I in range(1,i+1):
+        w=[[[Iit[T-1][I-1]],[1.0]]]
+        constraint_12.extend(w)
 
 constraint_13 = []
 for T in range(1,t+1):
-    for S in range(1,s+1):
-        for M in range(1,m+1):
-            var = [Xsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
-            coeff = [-INF,1]
-            constraint = [[var,coeff]]
-            constraint_13.extend(constraint)
+    for M in range(1,m+1):
+        qg = np.array([qgmt[T-1][M-1][G-1] for G in range(1,g+1)]).tolist()
+        qg_num = np.ones(g).tolist()
+        constraint = [[qg,qg_num]]
+        constraint_13.extend(constraint)
 
 constraint_14 = []
 for T in range(1,t+1):
-    for R in range(1,r+1):
-        for S in range(1,s+1):
-            var = [Xrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
-            coeff = [1,-INF]
-            constraint = [[var,coeff]]
-            constraint_14.extend(constraint)
+    for S in range(1,s+1):
+        xg = np.array([Xsgt[T-1][G-1][S-1] for G in range(1,g+1)]).tolist()
+        xg_num = np.ones(g).tolist()
+        constraint = [[xg,xg_num]]
+        constraint_14.extend(constraint)
 
 constraint_15 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
-        for S in range(1,s+1):
-            var = [Xrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
-            coeff = [-INF,1]
-            constraint = [[var,coeff]]
-            constraint_15.extend(constraint)
+        xs = np.array([Xrst[T-1][S-1][R-1] for S in range(1,s+1)]).tolist()
+        xs_num = np.ones(s).tolist()
+        constraint = [[xs,xs_num]]
+        constraint_15.extend(constraint)
 
 constraint_16 = []
 for T in range(1,t+1):
     for D in range(1,d+1):
-        for R in range(1,r+1):
-            var = [Xdrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
-            coeff = [1,-INF]
-            constraint = [[var,coeff]]
-            constraint_16.extend(constraint)
+        xr = np.array([Xdrt[T-1][R-1][D-1] for R in range(1,r+1)]).tolist()
+        xr_num = np.ones(r).tolist()
+        constraint = [[xr,xr_num]]
+        constraint_16.extend(constraint)
 
 constraint_17 = []
 for T in range(1,t+1):
-    for D in range(1,d+1):
-        for R in range(1,r+1):
-            var = [Xdrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
-            coeff = [-INF,1]
-            constraint = [[var,coeff]]
-            constraint_17.extend(constraint)
+    for I in range(1,i+1):
+        xd = np.array([Xidt[T-1][D-1][I-1] for D in range(1,d+1)]).tolist()
+        xd_num = np.ones(d).tolist()
+        constraint = [[xd,xd_num]]
+        constraint_17.extend(constraint)
+
+INF = cplex.infinity;
 
 constraint_18 = []
 for T in range(1,t+1):
-    for I in range(1,i+1):
-        for D in range(1,d+1):
-            var = [Xidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
+    for G in range(1,g+1):
+        for M in range(1,m+1):
+            var = [Xgmt[T-1][M-1][G-1],qgmt[T-1][M-1][G-1]]
             coeff = [1,-INF]
             constraint = [[var,coeff]]
             constraint_18.extend(constraint)
 
 constraint_19 = []
 for T in range(1,t+1):
-    for I in range(1,i+1):
-        for D in range(1,d+1):
-            var = [Xidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
+    for G in range(1,g+1):
+        for M in range(1,m+1):
+            var = [Xgmt[T-1][M-1][G-1],qgmt[T-1][M-1][G-1]]
             coeff = [-INF,1]
             constraint = [[var,coeff]]
             constraint_19.extend(constraint)
 
 constraint_20 = []
 for T in range(1,t+1):
-    for R in range(1,r+1):
-        xs = np.array([Xrst[T-1][S-1][R-1] for S in range(1,s+1)]).tolist()
-        xs_num = np.ones(s).tolist()
-        constraint = [[xs,xs_num]]
-        constraint_20.extend(constraint)
+    for S in range(1,s+1):
+        for G in range(1,g+1):
+            var = [Xsgt[T-1][G-1][S-1],qsgt[T-1][G-1][S-1]]
+            coeff = [1,-INF]
+            constraint = [[var,coeff]]
+            constraint_20.extend(constraint)
 
 constraint_21 = []
 for T in range(1,t+1):
-    for D in range(1,d+1):
-        xr = np.array([Xdrt[T-1][R-1][D-1] for R in range(1,r+1)]).tolist()
-        xr_num = np.ones(r).tolist()
-        constraint = [[xr,xr_num]]
-        constraint_21.extend(constraint)
+    for S in range(1,s+1):
+        for G in range(1,g+1):
+            var = [Xsgt[T-1][G-1][S-1],qsgt[T-1][G-1][S-1]]
+            coeff = [-INF,1]
+            constraint = [[var,coeff]]
+            constraint_21.extend(constraint)
 
 constraint_22 = []
 for T in range(1,t+1):
-    for I in range(1,i+1):
-        xd = np.array([Xidt[T-1][D-1][I-1] for D in range(1,d+1)]).tolist()
-        xd_num = np.ones(d).tolist()
-        constraint = [[xd,xd_num]]
-        constraint_22.extend(constraint)
-
+    for R in range(1,r+1):
+        for S in range(1,s+1):
+            var = [Xrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
+            coeff = [1,-INF]
+            constraint = [[var,coeff]]
+            constraint_22.extend(constraint)
 
 constraint_23 = []
 for T in range(1,t+1):
-    for M in range(1,m+1):
+    for R in range(1,r+1):
         for S in range(1,s+1):
-            var = [Nsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
-            coeff = [-1,1/cap_veh_sm]
+            var = [Xrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
+            coeff = [-INF,1]
             constraint = [[var,coeff]]
             constraint_23.extend(constraint)
 
-c23_rhs = 0*np.ones(len(c23.flatten()))
-
 constraint_24 = []
 for T in range(1,t+1):
-    for M in range(1,m+1):
-        for S in range(1,s+1):
-            var = [Nsmt[T-1][M-1][S-1],qsmt[T-1][M-1][S-1]]
-            coeff = [1,-1/cap_veh_sm]
+    for D in range(1,d+1):
+        for R in range(1,r+1):
+            var = [Xdrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
+            coeff = [1,-INF]
             constraint = [[var,coeff]]
             constraint_24.extend(constraint)
 
-c24_rhs = ((cap_veh_sm-1)/cap_veh_sm)*np.ones(len(c24.flatten()))
-
 constraint_25 = []
+for T in range(1,t+1):
+    for D in range(1,d+1):
+        for R in range(1,r+1):
+            var = [Xdrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
+            coeff = [-INF,1]
+            constraint = [[var,coeff]]
+            constraint_25.extend(constraint)
+
+constraint_26 = []
+for T in range(1,t+1):
+    for I in range(1,i+1):
+        for D in range(1,d+1):
+            var = [Xidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
+            coeff = [1,-INF]
+            constraint = [[var,coeff]]
+            constraint_26.extend(constraint)
+
+constraint_27 = []
+for T in range(1,t+1):
+    for I in range(1,i+1):
+        for D in range(1,d+1):
+            var = [Xidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
+            coeff = [-INF,1]
+            constraint = [[var,coeff]]
+            constraint_27.extend(constraint)
+
+
+constraint_28 = []
+for T in range(1,t+1):
+    for M in range(1,m+1):
+        for G in range(1,g+1):
+            var = [Ngmt[T-1][M-1][G-1],qgmt[T-1][M-1][G-1]]
+            coeff = [-1,1/cap_veh_gm]
+            constraint = [[var,coeff]]
+            constraint_28.extend(constraint)
+
+c28_rhs = 0*np.ones(len(c28.flatten()))
+
+constraint_29 = []
+for T in range(1,t+1):
+    for M in range(1,m+1):
+        for G in range(1,g+1):
+            var = [Ngmt[T-1][M-1][G-1],qgmt[T-1][M-1][G-1]]
+            coeff = [1,-1/cap_veh_gm]
+            constraint = [[var,coeff]]
+            constraint_29.extend(constraint)
+
+c29_rhs = ((cap_veh_gm-1)/cap_veh_gm)*np.ones(len(c29.flatten()))
+
+constraint_30 = []
+for T in range(1,t+1):
+    for G in range(1,g+1):
+        for S in range(1,s+1):
+            var = [Nsgt[T-1][G-1][S-1],qsgt[T-1][G-1][S-1]]
+            coeff = [-1,1/cap_veh_sg]
+            constraint = [[var,coeff]]
+            constraint_30.extend(constraint)
+
+c30_rhs = 0*np.ones(len(c30.flatten()))
+
+constraint_31 = []
+for T in range(1,t+1):
+    for G in range(1,g+1):
+        for S in range(1,s+1):
+            var = [Nsgt[T-1][G-1][S-1],qsgt[T-1][G-1][S-1]]
+            coeff = [1,-1/cap_veh_sg]
+            constraint = [[var,coeff]]
+            constraint_31.extend(constraint)
+
+c31_rhs = ((cap_veh_sg-1)/cap_veh_sg)*np.ones(len(c31.flatten()))
+
+constraint_32 = []
 for T in range(1,t+1):
     for S in range(1,s+1):
         for R in range(1,r+1):
             var = [Nrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
             coeff = [-1,1/cap_veh_rs]
             constraint = [[var,coeff]]
-            constraint_25.extend(constraint)
+            constraint_32.extend(constraint)
 
-c25_rhs = 0*np.ones(len(c25.flatten()))
+c32_rhs = 0*np.ones(len(c32.flatten()))
 
-constraint_26 = []
+constraint_33 = []
 for T in range(1,t+1):
     for S in range(1,s+1):
         for R in range(1,r+1):
             var = [Nrst[T-1][S-1][R-1],qrst[T-1][S-1][R-1]]
             coeff = [1,-1/cap_veh_rs]
             constraint = [[var,coeff]]
-            constraint_26.extend(constraint)
+            constraint_33.extend(constraint)
 
-c26_rhs = ((cap_veh_rs-1)/cap_veh_rs)*np.ones(len(c26.flatten()))
+c33_rhs = ((cap_veh_rs-1)/cap_veh_rs)*np.ones(len(c33.flatten()))
 
-constraint_27 = []
+constraint_34 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
         for D in range(1,d+1):
             var = [Ndrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
             coeff = [-1,1/cap_veh_dr]
             constraint = [[var,coeff]]
-            constraint_27.extend(constraint)
+            constraint_34.extend(constraint)
 
-c27_rhs = 0*np.ones(len(c27.flatten()))
+c34_rhs = 0*np.ones(len(c34.flatten()))
 
-constraint_28 = []
+constraint_35 = []
 for T in range(1,t+1):
     for R in range(1,r+1):
         for D in range(1,d+1):
             var = [Ndrt[T-1][R-1][D-1],qdrt[T-1][R-1][D-1]]
             coeff = [1,-1/cap_veh_dr]
             constraint = [[var,coeff]]
-            constraint_28.extend(constraint)
+            constraint_35.extend(constraint)
 
-c28_rhs = ((cap_veh_dr-1)/cap_veh_dr)*np.ones(len(c28.flatten()))
+c35_rhs = ((cap_veh_dr-1)/cap_veh_dr)*np.ones(len(c35.flatten()))
 
-constraint_29 = []
+constraint_36 = []
 for T in range(1,t+1):
     for D in range(1,d+1):
         for I in range(1,i+1):
             var = [Nidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
             coeff = [-1,1/cap_veh_id]
             constraint = [[var,coeff]]
-            constraint_29.extend(constraint)
+            constraint_36.extend(constraint)
 
-c29_rhs = 0*np.ones(len(c29.flatten()))
+c36_rhs = 0*np.ones(len(c36.flatten()))
 
-constraint_30 = []
+constraint_37 = []
 for T in range(1,t+1):
     for D in range(1,d+1):
         for I in range(1,i+1):
             var = [Nidt[T-1][D-1][I-1],qidt[T-1][D-1][I-1]]
             coeff = [1,-1/cap_veh_id]
             constraint = [[var,coeff]]
-            constraint_30.extend(constraint)
+            constraint_37.extend(constraint)
 
-c30_rhs = ((cap_veh_id-1)/cap_veh_id)*np.ones(len(c30.flatten()))
+c37_rhs = ((cap_veh_id-1)/cap_veh_id)*np.ones(len(c37.flatten()))
 
 
 constraints = []
-for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constraint_5,constraint_6,constraint_7,constraint_8,constraint_9,constraint_10,constraint_11,constraint_12,constraint_13,constraint_14,constraint_15,constraint_16,constraint_17,constraint_18,constraint_19,constraint_20,constraint_21,constraint_22,constraint_23,constraint_24,constraint_25,constraint_26,constraint_27,constraint_28,constraint_29,constraint_30]:
+for constraint in [constraint_1,constraint_2,constraint_3,constraint_4,constraint_5,constraint_6,constraint_7,constraint_8,constraint_9,constraint_10,constraint_11,constraint_12,constraint_13,constraint_14,constraint_15,constraint_16,constraint_17,constraint_18,constraint_19,constraint_20,constraint_21,constraint_22,constraint_23,constraint_24,constraint_25,constraint_26,constraint_27,constraint_28,constraint_29,constraint_30,constraint_31,constraint_32,constraint_33,constraint_34,constraint_35,constraint_36,constraint_37]:
     constraints.extend(constraint)
 
 
@@ -509,39 +602,50 @@ c1_rhs = 0*np.ones(len(c1.flatten()))
 c2_rhs = 0*np.ones(len(c2.flatten()))
 c3_rhs = 0*np.ones(len(c3.flatten()))
 c4_rhs = 0*np.ones(len(c4.flatten()))
+c5_rhs = 0*np.ones(len(c5.flatten()))
 
 dijt = [[[(1-J)*550/wastage_factor+J*425/wastage_factor for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
-c5_rhs = np.array(dijt).flatten()
-c6_rhs = c5_rhs
-c7_rhs = 56250*np.ones(s*t)
-c8_rhs = 28125*np.ones(r*t)
-c9_rhs = 2031*np.ones(d*t)
-c10_rhs = 2000*np.ones(i*t)
+c6_rhs = np.array(dijt).flatten()
+
+c7_rhs = c6_rhs
+
+c8_rhs = 56250*np.ones(g*t)
+c9_rhs = 56250*np.ones(s*t)
+c10_rhs = 28125*np.ones(r*t)
+c11_rhs = 2031*np.ones(d*t)
+c12_rhs = 2000*np.ones(i*t)
+
 Bmt = [[M for M in [12000,15000,11000]] for T in range(t)]
-c11_rhs = np.array(Bmt).flatten()
-c12_rhs = 0*np.ones(m*s*t);
-c13_rhs = 0*np.ones(m*s*t);
-c14_rhs = 0*np.ones(r*s*t);
-c15_rhs = 0*np.ones(r*s*t);
-c16_rhs = 0*np.ones(r*d*t);
-c17_rhs = 0*np.ones(r*d*t);
-c18_rhs = 0*np.ones(i*d*t);
-c19_rhs = 0*np.ones(i*d*t);
-c20_rhs = np.ones(r*t);
-c21_rhs = np.ones(d*t);
-c22_rhs = np.ones(i*t);
+c13_rhs = np.array(Bmt).flatten()
+
+c14_rhs = np.ones(s*t);
+c15_rhs = np.ones(r*t);
+c16_rhs = np.ones(d*t);
+c17_rhs = np.ones(i*t);
+
+c18_rhs = 0*np.ones(m*g*t);
+c19_rhs = 0*np.ones(m*g*t);
+c20_rhs = 0*np.ones(g*s*t);
+c21_rhs = 0*np.ones(g*s*t);
+c22_rhs = 0*np.ones(r*s*t);
+c23_rhs = 0*np.ones(r*s*t);
+c24_rhs = 0*np.ones(r*d*t);
+c25_rhs = 0*np.ones(r*d*t);
+c26_rhs = 0*np.ones(i*d*t);
+c27_rhs = 0*np.ones(i*d*t);
+
 
 rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs,c12_rhs,c13_rhs,c14_rhs,c15_rhs,c16_rhs,c17_rhs,c18_rhs,c19_rhs,c20_rhs,c21_rhs,c22_rhs,c23_rhs,c24_rhs,c25_rhs,c26_rhs,c27_rhs,c28_rhs,c29_rhs,c30_rhs),axis=None).tolist()
 
 #Adding constraint senses
-l1 = np.array(["E" for g in range((s+r+d+i)*t)])
+l1 = np.array(["E" for g in range((g+s+r+d+i)*t)])
 l2 = np.array(["L" for g in range(i*j*t)])
 l3 = np.array(["E" for g in range(i*j*t)])
-l4 = np.array(["L" for g in range((s+r+d+i)*t)])
+l4 = np.array(["L" for g in range((g+s+r+d+i)*t)])
 l5 = np.array(["L" for g in range(m*t)])
-l6 = np.array(["L" for g in range((m*s+s*r+r*d+d*i)*2*t)])
-l7 = np.array(["L" for g in range((r+d+i)*t)])
-l8 = np.array(["L" for g in range((m*s+s*r+r*d+d*i)*2*t)])
+l6 = np.array(["L" for g in range((s+r+d+i)*t)])
+l7 = np.array(["L" for g in range((m*g+g*s+s*r+r*d+d*i)*2*t)])
+l8 = np.array(["L" for g in range((m*g+g*s+s*r+r*d+d*i)*2*t)])
 
 
 constraint_senses = np.concatenate((l1,l2,l3,l4,l5,l6,l7,l8),axis=None).tolist()
