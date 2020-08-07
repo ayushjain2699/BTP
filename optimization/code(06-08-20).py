@@ -635,7 +635,7 @@ c26_rhs = 0*np.ones(i*d*t);
 c27_rhs = 0*np.ones(i*d*t);
 
 
-rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs,c12_rhs,c13_rhs,c14_rhs,c15_rhs,c16_rhs,c17_rhs,c18_rhs,c19_rhs,c20_rhs,c21_rhs,c22_rhs,c23_rhs,c24_rhs,c25_rhs,c26_rhs,c27_rhs,c28_rhs,c29_rhs,c30_rhs),axis=None).tolist()
+rhs = np.concatenate((c1_rhs,c2_rhs,c3_rhs,c4_rhs,c5_rhs,c6_rhs,c7_rhs,c8_rhs,c9_rhs,c10_rhs,c11_rhs,c12_rhs,c13_rhs,c14_rhs,c15_rhs,c16_rhs,c17_rhs,c18_rhs,c19_rhs,c20_rhs,c21_rhs,c22_rhs,c23_rhs,c24_rhs,c25_rhs,c26_rhs,c27_rhs,c28_rhs,c29_rhs,c30_rhs,c31_rhs,c32_rhs,c33_rhs,c34_rhs,c35_rhs,c36_rhs,c37_rhs),axis=None).tolist()
 
 #Adding constraint senses
 l1 = np.array(["E" for g in range((g+s+r+d+i)*t)])
