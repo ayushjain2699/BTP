@@ -1,0 +1,29 @@
+type,latitude,longitude,name,desc,precision,source
+W,26.1331997,87.4581985,"Araria , Bihar, India","Basantpur, India",city/town,Bing Maps
+W,25.2437401,84.663002,"Arwal , Bihar, India","Arwal, India",city/town,Bing Maps
+W,24.8850002,86.9243011,"Banka , Bihar, India","Banka, India",city/town,Bing Maps
+W,25.4240417,86.1346817,"Begusarai , Bihar, India","Begusarai, India",city/town,Bing Maps
+W,25.542944,84.6617355,"Bhojpur , Bihar, India","Bhojpur, India",Neighborhood,Bing Maps
+W,25.5610027,83.9806976,"Buxar , Bihar, India","Buxar, India",city/town,Bing Maps
+W,24.8216362,85.0353928,"Gaya , Bihar, India","Gaya, India",city/town,Bing Maps
+W,26.464222,84.4520035,"Gopalganj , Bihar, India","Gopalganj, India",city/town,Bing Maps
+W,24.9293995,86.2274017,"Jamui , Bihar, India","Jamui, India",city/town,Bing Maps
+W,25.2242966,84.9902039,"Jehanabad , Bihar, India","Jehanabad, India",city/town,Bing Maps
+W,25.0405903,83.6124115,"Kaimur , Bihar, India","Kaimur district, India",city/town,Bing Maps
+W,25.547905,87.5638809,"Katihar , Bihar, India","Katihar, India",city/town,Bing Maps
+W,25.5056992,86.4672012,"Khagaria , Bihar, India","Khagaria, India",city/town,Bing Maps
+W,26.0978012,87.9486008,"Kishanganj , Bihar, India","Kishanganj, India",city/town,Bing Maps
+W,25.1677799,86.0944366,"Lakhisarai , Bihar, India","Lakhisarai, India",city/town,Bing Maps
+W,25.9193001,86.7902985,"Madhepura , Bihar, India","Madhepura, India",city/town,Bing Maps
+W,26.3488998,86.0771027,"Madhubani , Bihar, India","Madhubani, India",city/town,Bing Maps
+W,25.3867664,86.4658813,"Munger , Bihar, India","Munger, India",city/town,Bing Maps
+W,24.8770924,85.5374908,"Nawada , Bihar, India","Nawada, India",city/town,Bing Maps
+W,24.6244164,83.9179001,"Rohtas , Bihar, India","Rohtas, India",city/town,Bing Maps
+W,25.8598003,85.7865982,"Samastipur , Bihar, India","Samastipur, India",city/town,Bing Maps
+W,25.1338959,85.8554001,"Sheikhpura , Bihar, India","Sheikhpura, India",city/town,Bing Maps
+W,26.5140991,85.2957001,"Sheohar , Bihar, India","Sheohar, India",city/town,Bing Maps
+W,26.5618992,85.5225983,"Sitamarhi , Bihar, India","Sitamarhi, India",city/town,Bing Maps
+W,26.1602955,84.4147491,"Siwan , Bihar, India","Siwan, India",city/town,Bing Maps
+W,26.1131001,86.5931015,"Supaul , Bihar, India","Supaul, India",city/town,Bing Maps
+W,25.9378166,85.1458969,"Vaishali , Bihar, India","Vaishali, India",city/town,Bing Maps
+W,26.8437004,84.6826019,"West Champaran , Bihar, India","Champaran, India",city/town,Bing Maps
