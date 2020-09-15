@@ -4,7 +4,7 @@ import pandas as pd
 import gurobipy as gp
 from gurobipy import GRB
 
-############INDEX################
+####################### INDEX ################################
 
 j = 2  #Customer sub index
 m = 3  #Manufacturer sub index
@@ -23,6 +23,8 @@ rvs = list(range(1,r+1))
 dvs = list(range(1,d+1))
 clinics = list(range(1,i+1))
 time = list(range(1,t+1))
+
+########################### PARAMETERS ################################
 
 #Transportation cost
 diesel_cost = 14
@@ -90,10 +92,83 @@ Crst = [[[25000 for R in range(r)] for S in range(s)] for T in range(t)]
 Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
 Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
 
+#Demand
+wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
+dijt = [[[(1-J)*550/wastage_factor+J*425/wastage_factor for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
+
 model = gp.Model('Vaccine_Distribution')
+
+#Production Capacity
+Bmt = [[M for M in [12000,15000,11000]] for T in range(t)]
+
+################### DECISION VARIABLES ##########################
+
 #Inventory
 Igt = model.addVars(time,gmsd,vtype=GRB.INTEGER, name="Igt")
 Ist = model.addVars(time,svs,vtype=GRB.INTEGER, name="Ist")
 Irt = model.addVars(time,rvs,vtype=GRB.INTEGER, name="Irt")
 Idt = model.addVars(time,dvs,vtype=GRB.INTEGER, name="Idt")
 Iit = model.addVars(time,clinics,vtype=GRB.INTEGER, name="Iit")
+
+#Quantity
+Qgmt = model.addVars(time,manufacturers,gmsd,vtype=GRB.INTEGER, name="Qgmt")
+Qsgt = model.addVars(time,gmsd,svs,vtype=GRB.INTEGER, name="Qsgt")
+Qrst = model.addVars(time,svs,rvs,vtype=GRB.INTEGER, name="Qrst")
+Qdrt = model.addVars(time,rvs,dvs,vtype=GRB.INTEGER, name="Qdrt")
+Qidt = model.addVars(time,dvs,clinics,vtype=GRB.INTEGER, name="Qidt")
+
+#Number of trucks
+Ngmt = model.addVars(time,manufacturers,gmsd,vtype=GRB.INTEGER, name="Ngmt")
+Nsgt = model.addVars(time,gmsd,svs,vtype=GRB.INTEGER, name="Nsgt")
+Nrst = model.addVars(time,svs,rvs,vtype=GRB.INTEGER, name="Nrst")
+Ndrt = model.addVars(time,rvs,dvs,vtype=GRB.INTEGER, name="Ndrt")
+Nidt = model.addVars(time,dvs,clinics,vtype=GRB.INTEGER, name="Nidt")
+
+#Assignment Variables
+Xgmt = model.addVars(time,manufacturers,gmsd,vtype=GRB.BINARY, name="Xgmt")
+Xsgt = model.addVars(time,gmsd,svs,vtype=GRB.BINARY, name="Xsgt")
+Xrst = model.addVars(time,svs,rvs,vtype=GRB.BINARY, name="Xrst")
+Xdrt = model.addVars(time,rvs,dvs,vtype=GRB.BINARY, name="Xdrt")
+Xidt = model.addVars(time,dvs,clinics,vtype=GRB.BINARY, name="Xidt")
+
+#Shortage and Consumption
+Sijt = model.addVars(time,customers,clinics,vtype=GRB.INTEGER, name="Sijt")
+Wijt = model.addVars(time,customers,clinics,vtype=GRB.INTEGER, name="Wijt")
+
+###################################### CONSTRAINTS ################################
+
+#Inventory Balance
+gmsd_inventory = model.addConstrs(((Igt[T-1][G] if T>1 else 0) + gp.quicksum(Qgmt[T][M][G] for M in manufacturers) 
+                                    - Igt[T][G] == gp.quicksum(Qsgt[T][G][S] for S in svs) for G in gmsd for T in time),
+                                     name="gmsd_inventory")
+svs_inventory = model.addConstrs(((Ist[T-1][S] if T>1 else 0) + gp.quicksum(Qsgt[T][G][S] for G in gmsd) 
+                                    - Ist[T][S] == gp.quicksum(Qrst[T][S][R] for R in rvs) for S in svs for T in time),
+                                     name="svs_inventory")
+rvs_inventory = model.addConstrs(((Irt[T-1][R] if T>1 else 0) + gp.quicksum(Qrst[T][S][R] for S in svs) 
+                                    - Irt[T][R] == gp.quicksum(Qdrt[T][R][D] for D in svs) for R in rvs for T in time),
+                                     name="rvs_inventory")
+dvs_inventory = model.addConstrs(((Idt[T-1][D] if T>1 else 0) + gp.quicksum(Qdrt[T][R][D] for R in rvs) 
+                                    - Idt[T][D] == gp.quicksum(Qidt[T][D][I] for I in clinics) for D in dvs for T in time),
+                                     name="dvs_inventory")
+clinic_inventory = model.addConstrs(((Iit[T-1][I] if T>1 else 0) + gp.quicksum(Qidt[T][D][I] for D in dvs) 
+                                    - Iit[T][I] == gp.quicksum(Wijt[T][J][I] for J in customers) for I in clinics for T in time),
+                                     name="clinic_inventory")
+
+#Consumption by demand
+consumption_demand = model.addConstrs((Wijt[T][J][I] <= dijt[T-1][J-1][I-1] for I in clinics for J in customers for T in time),
+                                    name = "consumption_demand")
+
+#Consumption Balance
+consumption_balance = model.addConstrs((Wijt[T][J][I] + Sijt[T][J][I] == dijt[T-1][J-1][I-1] for I in clinics for J in customers for T in time),
+                                    name = "consumption_balance")
+
+#Inventory Capacity constraints
+gmsd_cap = model.addConstrs((Igt[T][G]<=56250 for G in gmsd for T in time),name = "gmsd_cap")
+svs_cap = model.addConstrs((Ist[T][S]<=56250 for S in svs for T in time),name = "svs_cap")
+rvs_cap = model.addConstrs((Irt[T][R]<=28125 for R in rvs for T in time),name = "rvs_cap")
+dvs_cap = model.addConstrs((Idt[T][D]<=2031 for D in dvs for T in time),name = "dvs_cap")
+clinic_cap = model.addConstrs((Iit[T][I]<=2000 for I in clinics for T in time),name = "clinic_cap")
+
+#Production capacity constraints
+production_cap = model.addConstrs((gp.quicksum(Qgmt[T][M][G] for G in gmsd)<= Bmt[T-1][M-1] for M in manufacturers for T in time)
+                                ,name = "production_cap")
