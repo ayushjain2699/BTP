@@ -4,6 +4,8 @@ import pandas as pd
 import gurobipy as gp
 from gurobipy import GRB
 
+############INDEX################
+
 j = 2  #Customer sub index
 m = 3  #Manufacturer sub index
 g = 1  #GMSD index
@@ -13,14 +15,14 @@ d = 5  #District sub index
 i = 10 #Clinic sub index
 t = 4  #Time sub index
 
-customers = range(1,j+1)
-manufacturers = range(1,m+1)
-gmsd = range(1,g+1)
-svs = range(1,s+1)
-rvs = range(1,r+1)
-dvs = range(1,d+1)
-clinics = range(1,i+1)
-time = range(1,t+1)
+customers = list(range(1,j+1))
+manufacturers = list(range(1,m+1))
+gmsd = list(range(1,g+1))
+svs = list(range(1,s+1))
+rvs = list(range(1,r+1))
+dvs = list(range(1,d+1))
+clinics = list(range(1,i+1))
+time = list(range(1,t+1))
 
 #Transportation cost
 diesel_cost = 14
@@ -89,3 +91,9 @@ Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
 Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
 
 model = gp.Model('Vaccine_Distribution')
+#Inventory
+Igt = model.addVars(time,gmsd,vtype=GRB.INTEGER, name="Igt")
+Ist = model.addVars(time,svs,vtype=GRB.INTEGER, name="Ist")
+Irt = model.addVars(time,rvs,vtype=GRB.INTEGER, name="Irt")
+Idt = model.addVars(time,dvs,vtype=GRB.INTEGER, name="Idt")
+Iit = model.addVars(time,clinics,vtype=GRB.INTEGER, name="Iit")
