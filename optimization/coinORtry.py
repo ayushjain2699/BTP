@@ -13,7 +13,8 @@ A = np.matrix([[1., 2., 0],[1., 0, 1.]])
 B = np.matrix([[1., 0, 0], [0, 0, 1.]])
 D = np.matrix([[1., 2.],[0, 1]])
 a = CyLPArray([5, 2.5])
-b = CyLPArray([4.2, 3])
+b = np.array([5,2.5])
+#b = CyLPArray(k)
 x_u= CyLPArray([2., 3.5])
 
 # Add constraints
@@ -23,7 +24,8 @@ s += y >= 0
 s += 1.1 <= x[1:3] <= x_u
 
 # Set the objective function
-c = CyLPArray([1., -2., 3.])
+c = np.array([1., -2., 3.])
+c = CyLPArray(c)
 s.objective = c * x + 2 * y.sum()
 
 # Solve using primal Simplex
