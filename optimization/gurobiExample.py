@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import xlsxwriter
 
 import gurobipy as gp
 from gurobipy import GRB
@@ -173,7 +174,7 @@ svs_inventory = model.addConstrs(((Ist[T-1,S] if T>1 else 0) + gp.quicksum(Qsgt[
                                     - Ist[T,S] == gp.quicksum(Qrst[T,S,R] for R in rvs) for S in svs for T in time),
                                      name="svs_inventory")
 rvs_inventory = model.addConstrs(((Irt[T-1,R] if T>1 else 0) + gp.quicksum(Qrst[T,S,R] for S in svs) 
-                                    - Irt[T,R] == gp.quicksum(Qdrt[T,R,D] for D in svs) for R in rvs for T in time),
+                                    - Irt[T,R] == gp.quicksum(Qdrt[T,R,D] for D in dvs) for R in rvs for T in time),
                                      name="rvs_inventory")
 dvs_inventory = model.addConstrs(((Idt[T-1,D] if T>1 else 0) + gp.quicksum(Qdrt[T,R,D] for R in rvs) 
                                     - Idt[T,D] == gp.quicksum(Qidt[T,D,I] for I in clinics) for D in dvs for T in time),
@@ -260,7 +261,7 @@ Did_name = np.array([["D(i,d)("+str(I)+","+str(D)+")" for I in range(1,i+1)] for
 distances = np.concatenate((Dgm,Dsg,Drs,Ddr,Did),axis=None).tolist()
 D_names = np.concatenate((Dgm_name,Dsg_name,Drs_name,Ddr_name,Did_name),axis=None).tolist()
 
-workbook = xlsxwriter.Workbook('C:/Users/Shanmukhi/Desktop/test.xlsx')
+workbook = xlsxwriter.Workbook('C:/Users/Ayush/Desktop/test1.xlsx')
 worksheet = workbook.add_worksheet()
 merge_format = workbook.add_format({
     'bold': 1,

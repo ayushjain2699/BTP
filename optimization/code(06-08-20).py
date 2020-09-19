@@ -681,7 +681,7 @@ Did_name = np.array([["D(i,d)("+str(I)+","+str(D)+")" for I in range(1,i+1)] for
 distances = np.concatenate((Dgm,Dsg,Drs,Ddr,Did),axis=None).tolist()
 D_names = np.concatenate((Dgm_name,Dsg_name,Drs_name,Ddr_name,Did_name),axis=None).tolist()
 
-workbook = xlsxwriter.Workbook('C:/Users/Shanmukhi/Desktop/test.xlsx')
+workbook = xlsxwriter.Workbook('C:/Users/Ayush/Desktop/try.xlsx')
 worksheet = workbook.add_worksheet()
 merge_format = workbook.add_format({
     'bold': 1,
