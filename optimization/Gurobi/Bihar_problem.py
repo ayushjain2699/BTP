@@ -12,7 +12,7 @@ m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
 r = 9  #Region sub index
-d = 28  #District sub index
+d = 38  #District sub index
 i = 606 #Clinic sub index
 t = 12  #Time sub index
 
@@ -27,24 +27,29 @@ time = list(range(1,t+1))
 
 ########################### PARAMETERS ################################
 l = GRB.INFINITY #large number for consistency constraints
+fraction_storage = 1 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
+fraction_transport = 1 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
 
 #Transportation cost
 diesel_cost = 14
 booking_cost = 10000
 np.random.seed(133)
 
+#Distances
 Dgm = np.random.normal(1000,250,g*m).reshape(m,g)
 Dsg = np.random.normal(1000,250,s*g).reshape(g,s)
 Drs = np.random.normal(400,75,r*s).reshape(s,r)
 Ddr = np.random.normal(200,25,d*r).reshape(r,d)
 Did = np.random.normal(100,25,d*i).reshape(d,i)
 
+#Capacity of trucks
 cap_veh_gm = 5000
 cap_veh_sg = 5000 
 cap_veh_rs = 3000
 cap_veh_dr = 3000
 cap_veh_id = 1000
 
+#Final transportation costs
 Kgmt = np.array([[[Dgm[M][G]*diesel_cost+booking_cost for G in range(0,g)] for M in range(0,m)] for T in range(0,t)])
 Ksgt = np.array([[[Dsg[G][S]*diesel_cost+booking_cost for S in range(0,s)] for G in range(0,g)] for T in range(0,t)])
 Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
@@ -101,6 +106,26 @@ df_demand = pd.read_csv("demand_weekly.csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
     dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = df_demand['demand'][index]
+
+#Capacity of cold chain points
+Bgt = [[24545455 for G in range(g)] for T in range(t)]
+Bst = [[6818182 for S in range(s)] for T in range(t)]
+
+df_brt = pd.read_csv("capacity_RVS.csv")
+Brt = [[0 for R in range(1,r+1)] for T in range(1,t+1)]
+for index in df_brt.index:
+	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = df_brt['Capacity'][index]
+
+
+df_bdt = pd.read_csv("capacity_DVS.csv")
+Bdt = [[0 for D in range(1,d+1)] for T in range(1,t+1)]
+for index in df_bdt.index:
+	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = df_bdt['Capacity'][index]
+
+df_bit = pd.read_csv("capacity_clinics.csv")
+Bit = [[0 for I in range(1,i+1)] for T in range(1,t+1)]
+for index in df_bit.index:
+	Bit[df_bdt['t'][index]-1][df_bit['i'][index]-1] = df_bit['Capacity'][index]
 
 
 
@@ -198,11 +223,11 @@ consumption_balance = model.addConstrs((Wijt[T,J,I] + Sijt[T,J,I] == dijt[T-1][J
                                     name = "consumption_balance")
 
 #Inventory Capacity constraints
-gmsd_cap = model.addConstrs((Igt[T,G]<=56250 for G in gmsd for T in time),name = "gmsd_cap")
-svs_cap = model.addConstrs((Ist[T,S]<=56250 for S in svs for T in time),name = "svs_cap")
-rvs_cap = model.addConstrs((Irt[T,R]<=28125 for R in rvs for T in time),name = "rvs_cap")
-dvs_cap = model.addConstrs((Idt[T,D]<=2031 for D in dvs for T in time),name = "dvs_cap")
-clinic_cap = model.addConstrs((Iit[T,I]<=2000 for I in clinics for T in time),name = "clinic_cap")
+gmsd_cap = model.addConstrs((Igt[T-1,G-1]<=Bgt[T-1,G-1] for G in gmsd for T in time),name = "gmsd_cap")
+svs_cap = model.addConstrs((Ist[T-1,S-1]<=Bst[T-1,S-1] for S in svs for T in time),name = "svs_cap")
+rvs_cap = model.addConstrs((Irt[T-1,R-1]<=Brt[T-1,R-1] for R in rvs for T in time),name = "rvs_cap")
+dvs_cap = model.addConstrs((Idt[T-1,D-1]<=Bdt[T-1,D-1] for D in dvs for T in time),name = "dvs_cap")
+clinic_cap = model.addConstrs((Iit[T-1,I-1]<=Bit[T-1,I-1] for I in clinics for T in time),name = "clinic_cap")
 
 #Production capacity constraints
 production_cap = model.addConstrs((gp.quicksum(Qgmt[T,M,G] for G in gmsd)<= Bmt[T-1][M-1] for M in manufacturers for T in time)
