@@ -43,11 +43,12 @@ Ddr = np.random.normal(200,25,d*r).reshape(r,d)
 Did = np.random.normal(100,25,d*i).reshape(d,i)
 
 #Capacity of trucks
-cap_veh_gm = 5000
-cap_veh_sg = 5000 
-cap_veh_rs = 3000
-cap_veh_dr = 3000
-cap_veh_id = 1000
+cap_veh_gm = fraction_transport*2932075 #Refrigerated van
+cap_veh_sg = fraction_transport*2932075 #Refrigerated van
+cap_veh_rs = fraction_transport*290880 #Insulated van
+cap_veh_dr = fraction_transport*290880 #Insulated van
+cap_veh_id = fraction_transport*290880 #Insulated van
+
 
 #Final transportation costs
 Kgmt = np.array([[[Dgm[M][G]*diesel_cost+booking_cost for G in range(0,g)] for M in range(0,m)] for T in range(0,t)])
@@ -108,24 +109,24 @@ for index in df_demand.index:
     dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = df_demand['demand'][index]
 
 #Capacity of cold chain points
-Bgt = [[24545455 for G in range(g)] for T in range(t)]
-Bst = [[6818182 for S in range(s)] for T in range(t)]
+Bgt = [[fraction_storage*24545455 for G in range(g)] for T in range(t)]
+Bst = [[fraction_storage*6818182 for S in range(s)] for T in range(t)]
 
 df_brt = pd.read_csv("capacity_RVS.csv")
 Brt = [[0 for R in range(1,r+1)] for T in range(1,t+1)]
 for index in df_brt.index:
-	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = df_brt['Capacity'][index]
+	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
 
 
 df_bdt = pd.read_csv("capacity_DVS.csv")
 Bdt = [[0 for D in range(1,d+1)] for T in range(1,t+1)]
 for index in df_bdt.index:
-	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = df_bdt['Capacity'][index]
+	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
 
 df_bit = pd.read_csv("capacity_clinics.csv")
 Bit = [[0 for I in range(1,i+1)] for T in range(1,t+1)]
 for index in df_bit.index:
-	Bit[df_bdt['t'][index]-1][df_bit['i'][index]-1] = df_bit['Capacity'][index]
+	Bit[df_bdt['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
 
 
 
