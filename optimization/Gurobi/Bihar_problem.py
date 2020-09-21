@@ -32,12 +32,12 @@ fraction_transport = 1 #Fraction of total capacity in vehicles to be considered 
 
 #Transportation cost
 diesel_cost = 14
-booking_cost = 10000
+booking_cost = 5000
 np.random.seed(133)
 
 #Distances
-Dgm = [1000] #From M to G (confirm)
-Dsg = [550] #From G to S (confirm)
+Dgm = [[1000]] #From M to G (confirm)
+Dsg = [[550]] #From G to S (confirm)
 
 #From S to R
 df_Drs = pd.read_csv("distances_sr.csv")
@@ -75,39 +75,18 @@ Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost for I in range(0,i)] for D
 
 
 #Shortage costs
-Pjt = [[0 for J in range(j)] for T in range(t)]
-for T in range(t):
-    Pjt[T][0] = 750000
-    Pjt[T][1] = 650000
+Pjt = [[700000 for J in range(j)] for T in range(t)]
+# for T in range(t):
+#     Pjt[T][0] = 750000
+#     Pjt[T][1] = 650000
 #Pjt_obj = np.array([[[Pjt[T][J] for I in range(i)] for J in range(j)] for T in range(t)])
 
 #Inventory holding costs
-hgt = [[0.3],[0.3],[0.3],[0.3]] 
-hst = [[0.3],[0.3],[0.3],[0.3]] 
-hrt = [[0 for R in range(r)] for T in range(t)]
-hdt = [[0 for D in range(d)] for T in range(t)]
-hit = [[0 for I in range(i)] for T in range(t)]
-for T in range(t):
-    hrt[T][0] = 0.3
-    hrt[T][1] = 0.4
-    hrt[T][2] = 0.35
-for T in range(t):
-    hdt[T][0] = 0.4
-    hdt[T][1] = 0.44    
-    hdt[T][2] = 0.38
-    hdt[T][3] = 0.48
-    hdt[T][4] = 0.42
-for T in range(t):
-    hit[T][0] = 0.5
-    hit[T][1] = 0.46
-    hit[T][2] = 0.44
-    hit[T][3] = 0.51
-    hit[T][4] = 0.48
-    hit[T][5] = 0.38
-    hit[T][6] = 0.47
-    hit[T][7] = 0.55
-    hit[T][8] = 0.53
-    hit[T][9] = 0.50
+hgt = [[0.3 for G in range(g)] for T in range(t)]
+hst = [[0.3 for S in range(s)] for T in range(t)]
+hrt = np.random.normal(0.4,0.05,r*t).reshape(t,r)
+hdt = np.random.normal(0.4,0.05,d*t).reshape(t,d)
+hit = np.random.normal(0.4,0.05,i*t).reshape(t,i)
 
 #Ordering costs
 Cgmt = [[[25000 for G in range(g)] for M in range(m)] for T in range(t)]
@@ -149,7 +128,7 @@ for index in df_bit.index:
 model = gp.Model('Vaccine_Distribution')
 
 #Production Capacity
-Bmt = [[M for M in [12000,15000,11000]] for T in range(t)]
+Bmt = [[1000000 for M in range(m)] for T in range(t)]
 
 ################### DECISION VARIABLES ##########################
 
@@ -240,11 +219,11 @@ consumption_balance = model.addConstrs((Wijt[T,J,I] + Sijt[T,J,I] == dijt[T-1][J
                                     name = "consumption_balance")
 
 #Inventory Capacity constraints
-gmsd_cap = model.addConstrs((Igt[T-1,G-1]<=Bgt[T-1,G-1] for G in gmsd for T in time),name = "gmsd_cap")
-svs_cap = model.addConstrs((Ist[T-1,S-1]<=Bst[T-1,S-1] for S in svs for T in time),name = "svs_cap")
-rvs_cap = model.addConstrs((Irt[T-1,R-1]<=Brt[T-1,R-1] for R in rvs for T in time),name = "rvs_cap")
-dvs_cap = model.addConstrs((Idt[T-1,D-1]<=Bdt[T-1,D-1] for D in dvs for T in time),name = "dvs_cap")
-clinic_cap = model.addConstrs((Iit[T-1,I-1]<=Bit[T-1,I-1] for I in clinics for T in time),name = "clinic_cap")
+gmsd_cap = model.addConstrs((Igt[T,G]<=Bgt[T-1][G-1] for G in gmsd for T in time),name = "gmsd_cap")
+svs_cap = model.addConstrs((Ist[T,S]<=Bst[T-1][S-1] for S in svs for T in time),name = "svs_cap")
+rvs_cap = model.addConstrs((Irt[T,R]<=Brt[T-1][R-1] for R in rvs for T in time),name = "rvs_cap")
+dvs_cap = model.addConstrs((Idt[T,D]<=Bdt[T-1][D-1] for D in dvs for T in time),name = "dvs_cap")
+clinic_cap = model.addConstrs((Iit[T,I]<=Bit[T-1][I-1] for I in clinics for T in time),name = "clinic_cap")
 
 #Production capacity constraints
 production_cap = model.addConstrs((gp.quicksum(Qgmt[T,M,G] for G in gmsd)<= Bmt[T-1][M-1] for M in manufacturers for T in time)
@@ -294,11 +273,11 @@ for v in model.getVars():
 ###########################Printing the results to excel file################## 
 
 np.random.seed(133)
-Dgm = np.random.normal(1000,250,g*m).reshape(m,g)
-Dsg = np.random.normal(1000,250,s*g).reshape(g,s)
-Drs = np.random.normal(400,75,r*s).reshape(s,r)
-Ddr = np.random.normal(200,25,d*r).reshape(r,d)
-Did = np.random.normal(100,25,d*i).reshape(d,i)
+# Dgm = np.random.normal(1000,250,g*m).reshape(m,g)
+# Dsg = np.random.normal(1000,250,s*g).reshape(g,s)
+# Drs = np.random.normal(400,75,r*s).reshape(s,r)
+# Ddr = np.random.normal(200,25,d*r).reshape(r,d)
+# Did = np.random.normal(100,25,d*i).reshape(d,i)
 
 Dgm_name = np.array([["D(g,m)("+str(G)+","+str(M)+")" for G in range(1,g+1)] for M in range(1,m+1)])
 Dsg_name = np.array([["D(s,g)("+str(S)+","+str(G)+")" for S in range(1,s+1)] for G in range(1,g+1)]) 
