@@ -36,11 +36,27 @@ booking_cost = 10000
 np.random.seed(133)
 
 #Distances
-Dgm = np.random.normal(1000,250,g*m).reshape(m,g)
-Dsg = np.random.normal(1000,250,s*g).reshape(g,s)
-Drs = np.random.normal(400,75,r*s).reshape(s,r)
-Ddr = np.random.normal(200,25,d*r).reshape(r,d)
-Did = np.random.normal(100,25,d*i).reshape(d,i)
+Dgm = [1000] #From M to G (confirm)
+Dsg = [550] #From G to S (confirm)
+
+#From S to R
+df_Drs = pd.read_csv("distances_sr.csv")
+Drs = [[0 for R in range(r)] for S in range(s)]
+for index in df_Drs.index:
+	Drs[df_Drs['s'][index]-1][df_Drs['r'][index]-1] = df_Drs['Distance'][index]
+
+#From R to D
+df_Ddr = pd.read_csv("distances_rd.csv")
+Ddr = [[0 for D in range(d)] for R in range(r)]
+for index in df_Ddr.index:
+	Ddr[df_Ddr['r'][index]-1][df_Ddr['d'][index]-1] = df_Ddr['Distance'][index]
+
+#From D to I
+df_Did = pd.read_csv("distances_di.csv")
+Did = [[0 for I in range(i)] for D in range(d)]
+for index in df_Did.index:
+	Did[df_Did['d'][index]-1][df_Did['i'][index]-1] = df_Did['Distance'][index]
+
 
 #Capacity of trucks
 cap_veh_gm = fraction_transport*2932075 #Refrigerated van
@@ -113,20 +129,20 @@ Bgt = [[fraction_storage*24545455 for G in range(g)] for T in range(t)]
 Bst = [[fraction_storage*6818182 for S in range(s)] for T in range(t)]
 
 df_brt = pd.read_csv("capacity_RVS.csv")
-Brt = [[0 for R in range(1,r+1)] for T in range(1,t+1)]
+Brt = [[0 for R in range(r)] for T in range(t)]
 for index in df_brt.index:
 	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
 
 
 df_bdt = pd.read_csv("capacity_DVS.csv")
-Bdt = [[0 for D in range(1,d+1)] for T in range(1,t+1)]
+Bdt = [[0 for D in range(d)] for T in range(t)]
 for index in df_bdt.index:
 	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
 
 df_bit = pd.read_csv("capacity_clinics.csv")
-Bit = [[0 for I in range(1,i+1)] for T in range(1,t+1)]
+Bit = [[0 for I in range(i)] for T in range(t)]
 for index in df_bit.index:
-	Bit[df_bdt['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
+	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
 
 
 
