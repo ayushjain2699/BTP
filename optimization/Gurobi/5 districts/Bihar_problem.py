@@ -49,7 +49,7 @@ for index in df_Drs.index:
 df_Ddr = pd.read_csv("distances_rd.csv")
 Ddr = [[0 for D in range(d)] for R in range(r)]
 for index in df_Ddr.index:
-	if (df_Ddr['d'][index] > D):
+	if (df_Ddr['d'][index] > d):
 		continue
 	Ddr[df_Ddr['r'][index]-1][df_Ddr['d'][index]-1] = df_Ddr['Distance'][index]
 
@@ -57,7 +57,7 @@ for index in df_Ddr.index:
 df_Did = pd.read_csv("distances_di.csv")
 Did = [[0 for I in range(i)] for D in range(d)]
 for index in df_Did.index:
-	if (df_Did['d'][index] > D or df_Did['i'][index] > I):
+	if (df_Did['d'][index] > d or df_Did['i'][index] > i):
 		continue
 	Did[df_Did['d'][index]-1][df_Did['i'][index]-1] = df_Did['Distance'][index]
 
@@ -104,7 +104,7 @@ wastage_factor = 0.5 #This value will depend on the vaccine, we are talking abou
 df_demand = pd.read_csv("demand_weekly.csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
-	if (df_demand['i'][index] > I):
+	if (df_demand['i'][index] > i):
 		break
 
 	dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = df_demand['demand'][index]
@@ -122,7 +122,7 @@ for index in df_brt.index:
 df_bdt = pd.read_csv("capacity_DVS.csv")
 Bdt = [[0 for D in range(d)] for T in range(t)]
 for index in df_bdt.index:
-	if(df_bdt['d'][index] > D):
+	if(df_bdt['d'][index] > d):
 		break
 	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
 
@@ -130,7 +130,7 @@ for index in df_bdt.index:
 df_bit = pd.read_csv("capacity_clinics.csv")
 Bit = [[0 for I in range(i)] for T in range(t)]
 for index in df_bit.index:
-	if(df_bit['i'][index] > I):
+	if(df_bit['i'][index] > i):
 		break
 	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
 
