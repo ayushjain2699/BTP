@@ -12,8 +12,8 @@ m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
 r = 9  #Region sub index
-d = 5  #District sub index
-i = 59 #Clinic sub index
+d = 6  #District sub index
+i = 118 #Clinic sub index
 t = 12  #Time sub index
 
 customers = list(range(1,j+1))
@@ -76,11 +76,31 @@ Dsg = [[550]] #From G to S (confirm)
 
 # print(Bdt)
 
-df_bit = pd.read_csv("capacity_clinics.csv")
-Bit = [[0 for I in range(i)] for T in range(t)]
-for index in df_bit.index:
-	if(df_bit['i'][index] > 59):
-		break
-	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
+# df_bit = pd.read_csv("capacity_clinics.csv")
+# Bit = [[0 for I in range(i)] for T in range(t)]
+# for index in df_bit.index:
+# 	if(df_bit['i'][index] > 59):
+# 		break
+# 	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
 
-print(Bit)
+# print(Bit)
+
+# #From R to D
+# df_Ddr = pd.read_csv("distances_rd.csv")
+# Ddr = [[0 for D in range(d)] for R in range(r)]
+# for index in df_Ddr.index:
+# 	if (df_Ddr['d'][index] > 12 or df_Ddr['d'][index] < 7):
+# 		continue
+# 	Ddr[df_Ddr['r'][index]-1][df_Ddr['d'][index]-7] = df_Ddr['Distance'][index]
+
+# print(Ddr)
+
+#From D to I
+df_Did = pd.read_csv("distances_di.csv")
+Did = [[0 for I in range(i)] for D in range(d)]
+for index in df_Did.index:
+	if (df_Did['d'][index] > 12 or df_Did['d'][index] < 7  or df_Did['i'][index] > 194 or df_Did['i'][index] < 77):
+		continue
+	Did[df_Did['d'][index]-7][df_Did['i'][index]-77] = df_Did['Distance'][index]
+
+print(Did)
