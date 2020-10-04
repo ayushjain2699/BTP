@@ -12,8 +12,8 @@ m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
 r = 9  #Region sub index
-d = 5  #District sub index
-i = 59 #Clinic sub index
+d = 6  #District sub index
+i = 76 #Clinic sub index
 t = 12  #Time sub index
 
 customers = list(range(1,j+1))
@@ -276,7 +276,7 @@ model.optimize()
 names = []
 sol = []
 for v in model.getVars():
-    print(v.varName,"=", v.x)
+    #print(v.varName,"=", v.x)
     names.append(v.varName)
     sol.append(v.x)
 
