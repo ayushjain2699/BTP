@@ -482,10 +482,85 @@ for T in time:
 				row = row + 1
 
 
+##################################### Total Cost ##############################################
 
+############ Transportation Cost ##############
+for T in time:
+    for M in manufacturers:
+        for G in gmsd:
+            transport_cost = transport_cost + Kgmt[T-1][M-1][G-1]*Ngmt[T,M,G].x
+for T in time:
+    for G in gmsd:
+        for S in svs:
+            transport_cost = transport_cost + Ksgt[T-1][G-1][S-1]*Nsgt[T,G,S].x
+for T in time:
+    for S in svs:
+        for R in rvs:
+            transport_cost = transport_cost + Krst[T-1][S-1][R-1]*Nrst[T,S,R].x
+for T in time:
+    for R in rvs:
+        for D in dvs:
+            transport_cost = transport_cost + Kdrt[T-1][R-1][D-1]*Ndrt[T,R,D].x
+for T in time:
+    for D in dvs:
+        for I in clinics:
+            transport_cost = transport_cost + Kidt[T-1][D-1][I-1]*Nidt[T,D,I].x
 
+########### Inventory COst #############
 
+for T in time:
+    for G in gmsd:
+        inventory_cost = inventory_cost + hgt[T-1][G-1]*Igt[T,G].x
+for T in time:
+    for S in svs:
+        inventory_cost = inventory_cost + hst[T-1][S-1]*Ist[T,S].x
+for T in time:
+    for R in rvs:
+        inventory_cost = inventory_cost + hrt[T-1][R-1]*Irt[T,R].x
+for T in time:
+    for D in dvs:
+        inventory_cost = inventory_cost + hdt[T-1][D-1]*Idt[T,D].x
+for T in time:
+    for I in clinics:
+        inventory_cost = inventory_cost + hit[T-1][I-1]*Iit[T,I].x
 
+########### Shortage Cost ################
+for T in time:
+    for I in clinics:
+        for J in customers:
+            shortage_cost = shortage_cost + Pjt[T-1][J-1]*Sijt[T,J,I].x
+
+########### Consumption Cost ################
+for T in time:
+    for I in clinics:
+        for J in customers:
+            consumption_cost = consumption_cost + 0*Wijt[T,J,I].x
+
+############ Ordering Cost ##############
+for T in time:
+    for M in manufacturers:
+        for G in gmsd:
+            ordering_cost = ordering_cost + Cgmt[T-1][M-1][G-1]*Xgmt[T,M,G].x
+for T in time:
+    for G in gmsd:
+        for S in svs:
+            ordering_cost = ordering_cost + Csgt[T-1][G-1][S-1]*Xsgt[T,G,S].x
+for T in time:
+    for S in svs:
+        for R in rvs:
+            ordering_cost = ordering_cost + Crst[T-1][S-1][R-1]*Xrst[T,S,R].x
+for T in time:
+    for R in rvs:
+        for D in dvs:
+            ordering_cost = ordering_cost + Cdrt[T-1][R-1][D-1]*Xdrt[T,R,D].x
+for T in time:
+    for D in dvs:
+        for I in clinics:
+            ordering_cost = ordering_cost + Cidt[T-1][D-1][I-1]*Xidt[T,D,I].x
+
+################ Total ###############
+
+total_cost =  transport_cost + inventory_cost + shortage_cost + consumption_cost + ordering_cost
 
 
 
