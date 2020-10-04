@@ -1,0 +1,24 @@
+LOAD CSV FROM "file:///1-M%20to%20G.csv" as mg
+merge (m:Manufacturer {Name:toInteger(mg[0])})
+merge (g:GMSD {Name:toInteger(mg[1])})
+merge (m)-[:TO{quantites:mg[2]}]-(g)
+
+LOAD CSV FROM "file:///1-G%20to%20S.csv" as gs
+merge (s:SVS {Name:toInteger(gs[1])})
+merge (g:GMSD {Name:toInteger(gs[0])})
+merge (g)-[:TO{quantites:gs[2]}]-(s)
+
+LOAD CSV FROM "file:///1-S%20to%20R.csv" as sr
+merge (s:SVS {Name:toInteger(sr[0])})
+merge (r:RVS {Name:toInteger(sr[1])})
+merge (s)-[:TO{quantites:sr[2]}]-(r)
+
+LOAD CSV FROM "file:///1-R%20to%20D.csv" as rd
+merge (d:DVS {Name:toInteger(rd[1])})
+merge (r:RVS {Name:toInteger(rd[0])})
+merge (r)-[:TO{quantites:rd[2]}]-(d)
+
+LOAD CSV FROM "file:///1-D%20to%20I.csv" as di
+merge (d:DVS {Name:toInteger(di[0])})
+merge (i:Clinic {Name:toInteger(di[1])})
+merge (d)-[:TO{quantites:di[2]}]-(i)
