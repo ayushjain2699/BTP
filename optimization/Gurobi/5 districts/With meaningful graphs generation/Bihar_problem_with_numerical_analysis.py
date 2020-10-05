@@ -40,13 +40,13 @@ Dgm = [[1000]] #From M to G (confirm)
 Dsg = [[550]] #From G to S (confirm)
 
 #From S to R
-df_Drs = pd.read_csv("distances_sr.csv")
+df_Drs = pd.read_csv("../distances_sr.csv")
 Drs = [[0 for R in range(r)] for S in range(s)]
 for index in df_Drs.index:
 	Drs[df_Drs['s'][index]-1][df_Drs['r'][index]-1] = df_Drs['Distance'][index]
 
 #From R to D
-df_Ddr = pd.read_csv("distances_rd.csv")
+df_Ddr = pd.read_csv("../distances_rd.csv")
 Ddr = [[0 for D in range(d)] for R in range(r)]
 for index in df_Ddr.index:
 	if (df_Ddr['d'][index] > d):
@@ -54,7 +54,7 @@ for index in df_Ddr.index:
 	Ddr[df_Ddr['r'][index]-1][df_Ddr['d'][index]-1] = df_Ddr['Distance'][index]
 
 #From D to I
-df_Did = pd.read_csv("distances_di.csv")
+df_Did = pd.read_csv("../distances_di.csv")
 Did = [[0 for I in range(i)] for D in range(d)]
 for index in df_Did.index:
 	if (df_Did['d'][index] > d or df_Did['i'][index] > i):
@@ -101,7 +101,7 @@ Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
 #Demand
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
-df_demand = pd.read_csv("demand_weekly.csv")
+df_demand = pd.read_csv("../demand_weekly.csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
 	if (df_demand['i'][index] > i):
@@ -113,13 +113,13 @@ for index in df_demand.index:
 Bgt = [[fraction_storage*24545455 for G in range(g)] for T in range(t)]
 Bst = [[fraction_storage*6818182 for S in range(s)] for T in range(t)]
 
-df_brt = pd.read_csv("capacity_RVS.csv")
+df_brt = pd.read_csv("../capacity_RVS.csv")
 Brt = [[0 for R in range(r)] for T in range(t)]
 for index in df_brt.index:
 	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
 
 
-df_bdt = pd.read_csv("capacity_DVS.csv")
+df_bdt = pd.read_csv("../capacity_DVS.csv")
 Bdt = [[0 for D in range(d)] for T in range(t)]
 for index in df_bdt.index:
 	if(df_bdt['d'][index] > d):
@@ -127,7 +127,7 @@ for index in df_bdt.index:
 	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
 
 
-df_bit = pd.read_csv("capacity_clinics.csv")
+df_bit = pd.read_csv("../capacity_clinics.csv")
 Bit = [[0 for I in range(i)] for T in range(t)]
 for index in df_bit.index:
 	if(df_bit['i'][index] > i):
@@ -276,14 +276,14 @@ model.optimize()
 names = []
 sol = []
 for v in model.getVars():
-    print(v.varName,"=", v.x)
+    #print(v.varName,"=", v.x)
     names.append(v.varName)
     sol.append(v.x)
 
 
 ###########################Printing the results to excel file################## 
 
-workbook_1 = xlsxwriter.Workbook("Numerical Analysis/CCPs ordering.xlsx")
+workbook_1 = xlsxwriter.Workbook("CCPs_ordering.xlsx")
 
 import pandas as pd
 start = (g+s+r+d+i)*t 
@@ -464,7 +464,7 @@ for T in range(1,13):
 workbook_1.close()
 
 ###############################Shortage analysis########################
-workbook_2 = xlsxwriter.Workbook("Numerical Analysis/Shortages.xlsx")
+workbook_2 = xlsxwriter.Workbook("Shortages.xlsx")
 worksheet_2 = workbook_1.add_worksheet("Clinics with shortages")
 worksheet_2.write(0,0,"T")
 worksheet_2.write(0,1,"J")
@@ -485,6 +485,7 @@ for T in time:
 ##################################### Total Cost ##############################################
 
 ############ Transportation Cost ##############
+transport_cost = 0
 for T in time:
     for M in manufacturers:
         for G in gmsd:
@@ -507,7 +508,7 @@ for T in time:
             transport_cost = transport_cost + Kidt[T-1][D-1][I-1]*Nidt[T,D,I].x
 
 ########### Inventory COst #############
-
+inventory_cost = 0
 for T in time:
     for G in gmsd:
         inventory_cost = inventory_cost + hgt[T-1][G-1]*Igt[T,G].x
@@ -525,18 +526,21 @@ for T in time:
         inventory_cost = inventory_cost + hit[T-1][I-1]*Iit[T,I].x
 
 ########### Shortage Cost ################
+shortage_cost = 0
 for T in time:
     for I in clinics:
         for J in customers:
             shortage_cost = shortage_cost + Pjt[T-1][J-1]*Sijt[T,J,I].x
 
 ########### Consumption Cost ################
+consumption_cost = 0
 for T in time:
     for I in clinics:
         for J in customers:
             consumption_cost = consumption_cost + 0*Wijt[T,J,I].x
 
 ############ Ordering Cost ##############
+ordering_cost = 0
 for T in time:
     for M in manufacturers:
         for G in gmsd:
@@ -561,7 +565,6 @@ for T in time:
 ################ Total ###############
 
 total_cost =  transport_cost + inventory_cost + shortage_cost + consumption_cost + ordering_cost
-
 
 
 
