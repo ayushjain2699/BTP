@@ -12,8 +12,8 @@ m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
 r = 9  #Region sub index
-d = 6  #District sub index
-i = 76 #Clinic sub index
+d = 5  #District sub index
+i = 59 #Clinic sub index
 t = 12  #Time sub index
 
 customers = list(range(1,j+1))
@@ -27,12 +27,18 @@ time = list(range(1,t+1))
 
 ########################### PARAMETERS ################################
 l = GRB.INFINITY #large number for consistency constraints
-fraction_storage = 1 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
-fraction_transport = 1 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
+fraction_storage = 0.1 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
+fraction_transport = 0.1 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
 
 #Transportation cost
 diesel_cost = 14
-booking_cost = 5000
+booking_cost = {
+	"MG" : 40000,
+	"GS" : 20000,
+	"SR" : 12000,
+	"RD" : 10000,
+	"DI" : 5000
+}
 np.random.seed(133)
 
 #Distances
@@ -40,13 +46,13 @@ Dgm = [[1000]] #From M to G (confirm)
 Dsg = [[550]] #From G to S (confirm)
 
 #From S to R
-df_Drs = pd.read_csv("distances_sr.csv")
+df_Drs = pd.read_csv("Input_data/distances_sr.csv")
 Drs = [[0 for R in range(r)] for S in range(s)]
 for index in df_Drs.index:
 	Drs[df_Drs['s'][index]-1][df_Drs['r'][index]-1] = df_Drs['Distance'][index]
 
 #From R to D
-df_Ddr = pd.read_csv("distances_rd.csv")
+df_Ddr = pd.read_csv("Input_data/distances_rd.csv")
 Ddr = [[0 for D in range(d)] for R in range(r)]
 for index in df_Ddr.index:
 	if (df_Ddr['d'][index] > d):
@@ -54,7 +60,7 @@ for index in df_Ddr.index:
 	Ddr[df_Ddr['r'][index]-1][df_Ddr['d'][index]-1] = df_Ddr['Distance'][index]
 
 #From D to I
-df_Did = pd.read_csv("distances_di.csv")
+df_Did = pd.read_csv("Input_data/distances_di.csv")
 Did = [[0 for I in range(i)] for D in range(d)]
 for index in df_Did.index:
 	if (df_Did['d'][index] > d or df_Did['i'][index] > i):
@@ -70,15 +76,15 @@ cap_veh_id = fraction_transport*290880 #Insulated van
 
 
 #Final transportation costs
-Kgmt = np.array([[[Dgm[M][G]*diesel_cost+booking_cost for G in range(0,g)] for M in range(0,m)] for T in range(0,t)])
-Ksgt = np.array([[[Dsg[G][S]*diesel_cost+booking_cost for S in range(0,s)] for G in range(0,g)] for T in range(0,t)])
-Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
-Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost for D in range(0,d)] for R in range(0,r)] for T in range(0,t)])
-Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
+Kgmt = np.array([[[Dgm[M][G]*diesel_cost+booking_cost["MG"] for G in range(0,g)] for M in range(0,m)] for T in range(0,t)])
+Ksgt = np.array([[[Dsg[G][S]*diesel_cost+booking_cost["GS"] for S in range(0,s)] for G in range(0,g)] for T in range(0,t)])
+Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost["SR"] for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
+Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost["RD"] for D in range(0,d)] for R in range(0,r)] for T in range(0,t)])
+Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
 
 
 #Shortage costs
-Pjt = [[700000 for J in range(j)] for T in range(t)]
+Pjt = [[1000000 for J in range(j)] for T in range(t)]
 # for T in range(t):
 #     Pjt[T][0] = 750000
 #     Pjt[T][1] = 650000
@@ -92,16 +98,16 @@ hdt = np.random.normal(0.4,0.05,d*t).reshape(t,d)
 hit = np.random.normal(0.4,0.05,i*t).reshape(t,i)
 
 #Ordering costs
-Cgmt = [[[25000 for G in range(g)] for M in range(m)] for T in range(t)]
-Csgt = [[[25000 for S in range(s)] for G in range(g)] for T in range(t)]
-Crst = [[[25000 for R in range(r)] for S in range(s)] for T in range(t)]
+Cgmt = [[[200000 for G in range(g)] for M in range(m)] for T in range(t)]
+Csgt = [[[100000 for S in range(s)] for G in range(g)] for T in range(t)]
+Crst = [[[75000 for R in range(r)] for S in range(s)] for T in range(t)]
 Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
-Cidt = [[[25000 for I in range(i)] for D in range(d)] for T in range(t)]
+Cidt = [[[15000 for I in range(i)] for D in range(d)] for T in range(t)]
 
 #Demand
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
-df_demand = pd.read_csv("demand_weekly.csv")
+df_demand = pd.read_csv("Input_data/demand_weekly.csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
 	if (df_demand['i'][index] > i):
@@ -113,13 +119,13 @@ for index in df_demand.index:
 Bgt = [[fraction_storage*24545455 for G in range(g)] for T in range(t)]
 Bst = [[fraction_storage*6818182 for S in range(s)] for T in range(t)]
 
-df_brt = pd.read_csv("capacity_RVS.csv")
+df_brt = pd.read_csv("Input_data/capacity_RVS.csv")
 Brt = [[0 for R in range(r)] for T in range(t)]
 for index in df_brt.index:
 	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
 
 
-df_bdt = pd.read_csv("capacity_DVS.csv")
+df_bdt = pd.read_csv("Input_data/capacity_DVS.csv")
 Bdt = [[0 for D in range(d)] for T in range(t)]
 for index in df_bdt.index:
 	if(df_bdt['d'][index] > d):
@@ -127,7 +133,7 @@ for index in df_bdt.index:
 	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
 
 
-df_bit = pd.read_csv("capacity_clinics.csv")
+df_bit = pd.read_csv("Input_data/capacity_clinics.csv")
 Bit = [[0 for I in range(i)] for T in range(t)]
 for index in df_bit.index:
 	if(df_bit['i'][index] > i):
@@ -281,180 +287,172 @@ for v in model.getVars():
     sol.append(v.x)
 
 
-###########################Printing the results to excel file################## 
+###########################Code for generating CSV files for graphical analysis################## 
 
-# np.random.seed(133)
-# Dgm = np.random.normal(1000,250,g*m).reshape(m,g)
-# Dsg = np.random.normal(1000,250,s*g).reshape(g,s)
-# Drs = np.random.normal(400,75,r*s).reshape(s,r)
-# Ddr = np.random.normal(200,25,d*r).reshape(r,d)
-# Did = np.random.normal(100,25,d*i).reshape(d,i)
+import pandas as pd
+start = (g+s+r+d+i)*t 
+T = 1
+for T in range(1,13):
+    x = start + (T-1)*m*g
+    address = "Excel files/"
+    address += str(T)
+    address += "-M to G"
+    address += ".xlsx"
+    #print(address)
 
-Dgm_name = np.array([["D(g,m)("+str(G)+","+str(M)+")" for G in range(1,g+1)] for M in range(1,m+1)])
-Dsg_name = np.array([["D(s,g)("+str(S)+","+str(G)+")" for S in range(1,s+1)] for G in range(1,g+1)]) 
-Drs_name = np.array([["D(r,s)("+str(R)+","+str(S)+")" for R in range(1,r+1)] for S in range(1,s+1)])
-Ddr_name = np.array([["D(d,r)("+str(D)+","+str(R)+")" for D in range(1,d+1)] for R in range(1,r+1)])
-Did_name = np.array([["D(i,d)("+str(I)+","+str(D)+")" for I in range(1,i+1)] for D in range(1,d+1)])
+    #M to G
+    workbook = xlsxwriter.Workbook(address)
+    worksheet = workbook.add_worksheet("M to G")
+    row = 0
+    count = 0
+    for M in range(m):
+        for G in range(g):
+            if (round(sol[x+count]) != 0):
+                worksheet.write(row,0,M+1)
+                worksheet.write(row,1,G+1)
+                worksheet.write(row,2,sol[x+count])
+                count += 1
+                row += 1
+            else:
+                count += 1
+    #print("M to G done")
+    workbook.close()
+    read_file = pd.read_excel (address) 
+    csv_address ="CSV files/"
+    csv_address += str(T)
+    csv_address += "-M to G"
+    csv_address += ".csv"
+    read_file.to_csv (csv_address, index = None, header=True) 
+    
+    #G to S
+    x = x + (t-T+1)*m*g +(T-1)*s*g
+    address = "Excel files/"
+    address += str(T)
+    address += "-G to S"
+    address += ".xlsx"
+    #print(address)
+    workbook = xlsxwriter.Workbook(address)
+    worksheet = workbook.add_worksheet("G to S")
+    row = 0
+    count = 0
+    for G in range(g):
+        for S in range(s):
+            if (round(sol[x+count]) != 0):
+                worksheet.write(row,0,G+1)
+                worksheet.write(row,1,S+1)
+                worksheet.write(row,2,sol[x+count])
+                row += 1
+                count += 1
+            else:
+                count += 1
+    #print("G to S done")
+    workbook.close()
+    read_file = pd.read_excel (address) 
+    csv_address ="CSV files/"
+    csv_address += str(T)
+    csv_address += "-G to S"
+    csv_address += ".csv"
+    read_file.to_csv (csv_address, index = None, header=True) 
 
-distances = np.concatenate((Dgm,Dsg,Drs,Ddr,Did),axis=None).tolist()
-D_names = np.concatenate((Dgm_name,Dsg_name,Drs_name,Ddr_name,Did_name),axis=None).tolist()
+    #S to R
+    x = x + (t-T+1)*g*s + (T-1)*r*s
+    address = "Excel files/"
+    address += str(T)
+    address += "-S to R"
+    address += ".xlsx"
+    #print(address)
+    workbook = xlsxwriter.Workbook(address)
+    worksheet = workbook.add_worksheet("S to R")
+    row = 0
+    count = 0
+    for S in range(s):
+        for R in range(r):
+            if (round(sol[x+count]) != 0):
+                worksheet.write(row,0,S+1)
+                worksheet.write(row,1,R+1)
+                worksheet.write(row,2,sol[x+count])
+                row += 1
+                count += 1
+            else:
+                count += 1
+    #print("S to R done")
+    workbook.close()
+    read_file = pd.read_excel (address) 
+    csv_address ="CSV files/"
+    csv_address += str(T)
+    csv_address += "-S to R"
+    csv_address += ".csv"
+    read_file.to_csv (csv_address, index = None, header=True) 
 
-workbook = xlsxwriter.Workbook('C:/Users/Ayush/Desktop/test1.xlsx')
-worksheet = workbook.add_worksheet()
-merge_format = workbook.add_format({
-    'bold': 1,
-    'border': 1,
-    'align': 'center',
-    'valign': 'vcenter'})
+    #R to D
+    x = x + (t-T+1)*s*r + (T-1)*r*d
+    address = "Excel files/"
+    address += str(T)
+    address += "-R to D"
+    address += ".xlsx"
+    #print(address)
+    workbook = xlsxwriter.Workbook(address)
+    worksheet = workbook.add_worksheet("R to D")
+    row = 0
+    count = 0
+    for R in range(r):
+        for D in range(d):
+            if (round(sol[x+count]) != 0):
+                worksheet.write(row,0,R+1)
+                worksheet.write(row,1,D+1)
+                worksheet.write(row,2,sol[x+count])
+                row += 1
+                count += 1
+            else:
+                count += 1
+    #print("R to D done")
+    workbook.close()
+    read_file = pd.read_excel (address) 
+    csv_address ="CSV files/"
+    csv_address += str(T)
+    csv_address += "-R to D"
+    csv_address += ".csv"
+    read_file.to_csv (csv_address, index = None, header=True) 
 
-worksheet.merge_range('A1:B1', 'Inventory', merge_format)
-worksheet.merge_range('C1:D1', 'Consumption', merge_format)
-worksheet.merge_range('E1:F1', 'Shortage', merge_format)
-worksheet.merge_range('G1:H1', 'Delivery from M to G', merge_format)
-worksheet.merge_range('I1:J1', 'X from M to G', merge_format)
-worksheet.merge_range('K1:L1', 'No of Trucks from M to G', merge_format)
-worksheet.merge_range('M1:N1', 'Distance from M to G', merge_format)
-worksheet.merge_range('O1:P1', 'Delivery from G to S', merge_format)
-worksheet.merge_range('Q1:R1', 'X from G to S', merge_format)
-worksheet.merge_range('S1:T1', 'No of Trucks from G to S', merge_format)
-worksheet.merge_range('U1:V1', 'Distance from G to S', merge_format)
-worksheet.merge_range('W1:X1', 'Delivery from S to R', merge_format)
-worksheet.merge_range('Y1:Z1', 'X from S to R', merge_format)
-worksheet.merge_range('AA1:AB1', 'No of Trucks from S to R', merge_format)
-worksheet.merge_range('AC1:AD1', 'Distance from S to R', merge_format)
-worksheet.merge_range('AE1:AF1', 'Delivery from R to D', merge_format)
-worksheet.merge_range('AG1:AH1', 'X from R to D', merge_format)
-worksheet.merge_range('AI1:AJ1', 'No of Trucks from R to D', merge_format)
-worksheet.merge_range('AK1:AL1', 'Distance from R to D', merge_format)
-worksheet.merge_range('AM1:AN1', 'Delivery from D to I', merge_format)
-worksheet.merge_range('AO1:AP1', 'X from D to I', merge_format)
-worksheet.merge_range('AQ1:AR1', 'No of Trucks from D to I', merge_format)
-worksheet.merge_range('AS1:AT1', 'Distance from D to I', merge_format)
+    #D to I
+    x = x + (t-T+1)*r*d + (T-1)*d*i
+    address = "Excel files/"
+    address += str(T)
+    address += "-D to I"
+    address += ".xlsx"
+    #print(address)
+    workbook = xlsxwriter.Workbook(address)
+    worksheet = workbook.add_worksheet("D to I")
+    row = 0
+    count = 0
+    for D in range(d):
+        for I in range(i):
+            if (round(sol[x+count]) != 0):
+                worksheet.write(row,0,D+1)
+                worksheet.write(row,1,I+1)
+                worksheet.write(row,2,sol[x+count])
+                row += 1
+                count += 1
+            else:
+                count += 1
+    #print("D to I done")
+    workbook.close()
+    read_file = pd.read_excel (address) 
+    csv_address ="CSV files/"
+    csv_address += str(T)
+    csv_address += "-D to I"
+    csv_address += ".csv"
+    read_file.to_csv (csv_address, index = None, header=True)
 
-x = 0
-y = 0
-z = 0
-row = 1
-col = 0
 
-#Inventory
-for x in range((g+s+r+d+i)*t):
-    worksheet.write(row, col, names[x])
-    worksheet.write(row, col + 1, round(sol[x]))
-    row += 1
 
-#Qgmt, Xgmt, Ngmt
-row = 1
-for y in range(x+1,x+g*m*t+1):
-    worksheet.write(row, 6, names[y])
-    worksheet.write(row, 7, round(sol[y]))
-    worksheet.write(row, 8, names[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 9, round(sol[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    worksheet.write(row, 10, names[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 11, round(sol[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    row +=1
 
-#Qsgt,Xsgt,Nsgt
-row = 1
-for z in range(y+1,y+s*g*t+1):
-    worksheet.write(row, 14, names[z])
-    worksheet.write(row, 15, round(sol[z]))
-    worksheet.write(row, 16, names[z+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 17, round(sol[z+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    worksheet.write(row, 18, names[z+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 19, round(sol[z+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    row +=1
 
-#Qrst,Xrst,Nrst
-row = 1
-x = z
-for y in range(x+1,x+r*s*t+1):
-    worksheet.write(row, 22, names[y])
-    worksheet.write(row, 23, round(sol[y]))
-    worksheet.write(row, 24, names[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 25, round(sol[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    worksheet.write(row, 26, names[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 27, round(sol[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    row +=1
 
-#Qdrt,Xdrt,Ndrt
-row = 1
-x = y
-for y in range(x+1,x+r*d*t+1):
-    worksheet.write(row, 30, names[y])
-    worksheet.write(row, 31, round(sol[y]))
-    worksheet.write(row, 32, names[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 33, round(sol[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    worksheet.write(row, 34, names[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 35, round(sol[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    row +=1
 
-#Qidt,Xidt,Nidt
-row = 1
-x = y
-for y in range(x+1,x+i*d*t+1):
-    worksheet.write(row, 38, names[y])
-    worksheet.write(row, 39, round(sol[y]))
-    worksheet.write(row, 40, names[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 41, round(sol[y+(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    worksheet.write(row, 42, names[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t])
-    worksheet.write(row, 43, round(sol[y+2*(g*m+d*r+s*g+r*s+i*d)*t+2*i*j*t]))
-    row +=1
 
-#Shortage
-row = 1
-x = y
-for y in range(x+1,x+i*j*t+1):
-    worksheet.write(row, 4, names[y])
-    worksheet.write(row, 5, round(sol[y]))
-    row +=1
 
-#Consumption
-row = 1
-x = y
-for y in range(x+1,x+i*j*t+1):
-    worksheet.write(row, 2, names[y])
-    worksheet.write(row, 3, round(sol[y]))
-    row +=1
 
-#Distances from M to G
-row = 1
-for y in range(g*m):
-    worksheet.write(row, 12, D_names[y])
-    worksheet.write(row, 13, distances[y])
-    row +=1
 
-#Distances from G to S
-row = 1
-x = y
-for y in range(x+1,x+s*g+1):
-    worksheet.write(row, 20, D_names[y])
-    worksheet.write(row, 21, distances[y])
-    row +=1
 
-#Distances from S to R
-row = 1
-x = y
-for y in range(x+1,x+s*r+1):
-    worksheet.write(row, 28, D_names[y])
-    worksheet.write(row, 29, distances[y])
-    row +=1
-
-#Distances from R to D
-row = 1
-x = y
-for y in range(x+1,x+d*r+1):
-    worksheet.write(row, 36, D_names[y])
-    worksheet.write(row, 37, distances[y])
-    row +=1
-
-#Distances from D to I
-row = 1
-x = y
-for y in range(x+1,x+d*i+1):
-    worksheet.write(row, 44, D_names[y])
-    worksheet.write(row, 45, distances[y])
-    row +=1
-
-workbook.close()
 
