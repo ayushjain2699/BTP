@@ -32,7 +32,13 @@ fraction_transport = 1 #Fraction of total capacity in vehicles to be considered 
 
 #Transportation cost
 diesel_cost = 14
-booking_cost = 5000
+booking_cost = {
+	"MG" : 40000,
+	"GS" : 20000,
+	"SR" : 12000,
+	"RD" : 10000,
+	"DI" : 5000
+}
 np.random.seed(133)
 
 #Distances
@@ -70,11 +76,11 @@ cap_veh_id = fraction_transport*290880 #Insulated van
 
 
 #Final transportation costs
-Kgmt = np.array([[[Dgm[M][G]*diesel_cost+booking_cost for G in range(0,g)] for M in range(0,m)] for T in range(0,t)])
-Ksgt = np.array([[[Dsg[G][S]*diesel_cost+booking_cost for S in range(0,s)] for G in range(0,g)] for T in range(0,t)])
-Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
-Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost for D in range(0,d)] for R in range(0,r)] for T in range(0,t)])
-Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
+Kgmt = np.array([[[Dgm[M][G]*diesel_cost+booking_cost["MG"] for G in range(0,g)] for M in range(0,m)] for T in range(0,t)])
+Ksgt = np.array([[[Dsg[G][S]*diesel_cost+booking_cost["GS"] for S in range(0,s)] for G in range(0,g)] for T in range(0,t)])
+Krst = np.array([[[Drs[S][R]*diesel_cost+booking_cost["SR"] for R in range(0,r)] for S in range(0,s)] for T in range(0,t)])
+Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost["RD"] for D in range(0,d)] for R in range(0,r)] for T in range(0,t)])
+Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
 
 
 #Shortage costs
