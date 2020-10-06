@@ -465,7 +465,7 @@ workbook_1.close()
 
 ###############################Shortage analysis########################
 workbook_2 = xlsxwriter.Workbook("Shortages.xlsx")
-worksheet_2 = workbook_1.add_worksheet("Clinics with shortages")
+worksheet_2 = workbook_2.add_worksheet("Clinics with shortages")
 worksheet_2.write(0,0,"T")
 worksheet_2.write(0,1,"J")
 worksheet_2.write(0,2,"I")
@@ -481,7 +481,7 @@ for T in time:
 				worksheet_2.write(row,3,round(Sijt[T,J,I].x))
 				row = row + 1
 
-
+workbook_2.close()
 ##################################### Total Cost ##############################################
 
 ############ Transportation Cost ##############
