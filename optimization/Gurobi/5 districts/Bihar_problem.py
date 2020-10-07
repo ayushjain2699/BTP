@@ -444,14 +444,114 @@ for T in range(1,13):
     csv_address += ".csv"
     read_file.to_csv (csv_address, index = None, header=True)
 
+############################################ Summary #####################################################
 
 
+no_of_times_M = ""
+cost_M = ""
+total_cost_M = 0
+for M in manufacturers:
+    number = 0
+    cost = 0
+    for G in gmsd:
+        for T in time:
+            number =  number + Xgmt[T,M,G].x
+            cost = cost + Kgmt[T-1][M-1][G-1]*Ngmt[T,M,G].x
+    if(number!=0):
+        if(no_of_times_M==""):
+            no_of_times_M += (str(M)+"("+str(number)+" times"+")")
+            cost_M += (str(M)+"("+str(cost)+" Rs"+")")
+        else:
+            no_of_times_M += (", "+str(M)+"("+str(number)+" times"+")")
+            cost_M += (", "+str(M)+"("+str(cost)+" Rs"+")")
+        total_cost_M += cost
 
 
+no_of_times_G = ""
+cost_G = ""
+total_cost_G = 0
+for G in gmsd:
+    number = 0
+    cost = 0
+    for S in svs:
+        for T in time:
+            number =  number + Xsgt[T,G,S].x
+            cost = cost + Ksgt[T-1][G-1][S-1]*Nsgt[T,G,S].x
+    if(number!=0):
+        if(no_of_times_G==""):
+            no_of_times_G += (str(G)+"("+str(number)+" times"+")")
+            cost_G += (str(G)+"("+str(cost)+" Rs"+")")
+        else:
+            no_of_times_G += (", "+str(G)+"("+str(number)+" times"+")")
+            cost_G += (", "+str(G)+"("+str(cost)+" Rs"+")")
+        total_cost_G += cost
 
 
+no_of_times_S = ""
+cost_S = ""
+total_cost_S = 0
+for S in svs:
+    number = 0
+    cost = 0
+    for R in dvs:
+        for T in time:
+            number =  number + Xrst[T,S,R].x
+            cost = cost + Krst[T-1][S-1][R-1]*Nrst[T,S,R].x
+    if(number!=0):
+        if(no_of_times_S==""):
+            no_of_times_S += (str(S)+"("+str(number)+" times"+")")
+            cost_S += (str(S)+"("+str(cost)+" Rs"+")")
+        else:
+            no_of_times_S += (", "+str(S)+"("+str(number)+" times"+")")
+            cost_S += (", "+str(S)+"("+str(cost)+" Rs"+")")
+        total_cost_S += cost
 
 
+no_of_times_R = ""
+cost_R = ""
+total_cost_R = 0
+for R in rvs:
+    number = 0
+    cost = 0
+    for D in dvs:
+        for T in time:
+            number =  number + Xdrt[T,R,D].x
+            cost = cost + Kdrt[T-1][R-1][D-1]*Ndrt[T,R,D].x
+    if(number!=0):
+        if(no_of_times_R==""):
+            no_of_times_R += (str(R)+"("+str(number)+" times"+")")
+            cost_R += (str(R)+"("+str(cost)+" Rs"+")")
+        else:
+            no_of_times_R += (", "+str(R)+"("+str(number)+" times"+")")
+            cost_R += (", "+str(R)+"("+str(cost)+" Rs"+")")
+        total_cost_R += cost
+        
+no_of_times_D = ""
+cost_D = ""
+total_cost_D = 0
+for D in dvs:
+    number = 0
+    cost = 0
+    for I in clinics:
+        for T in time:
+            number =  number + Xidt[T,D,I].x
+            cost = cost + Kidt[T-1][D-1][I-1]*Nidt[T,D,I].x
+    if(number!=0):
+        if(no_of_times_D==""):
+            no_of_times_D += (str(D)+"("+str(number)+" times"+")")
+            cost_D += (str(D)+"("+str(cost)+" Rs"+")")
+        else:
+            no_of_times_D += (", "+str(D)+"("+str(number)+" times"+")")
+            cost_D += (", "+str(D)+"("+str(cost)+" Rs"+")")
+        total_cost_D += cost
+
+
+transport_part = {
+    "From":["M->G","G->S","S->R","R->D","D->I"],
+    "Number of times transport occurs over the entire planning horizon":[no_of_times_M,no_of_times_G,no_of_times_S,no_of_times_R,no_of_times_D],
+    "Cost Incurred":[cost_M,cost_G,cost_S,cost_R,cost_D],
+    "Total Cost":[total_cost_M,total_cost_G,total_cost_S,total_cost_R,total_cost_D]
+}
 
 
 
