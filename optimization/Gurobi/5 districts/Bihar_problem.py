@@ -446,104 +446,172 @@ for T in range(1,13):
 
 ############################################ Summary #####################################################
 
+# Shortage costs
 
+clinic_breakpoints = [10,16,28,40,59]
+I_s = 0
+D = 0
+
+no_of_times_shortage = ""
+total_shortage_cost = 0
+for I_b in clinic_breakpoints:
+    shortage_cost = 0
+    number = 0
+    D += 1
+    for I in range(I_s,I_b+1):
+        for J in customers:
+            for T in time:
+                if (Sijt[T,J,I] != 0):
+                    shortage_cost += Sijt[T,J,I].x
+                    number += 1
+
+    I_s = I
+    if (number!=0):
+        if(no_of_times_shortage == ""):
+            no_of_times_shortage += (str(D)+"("+str(number)+" times"+")")
+            cost_shortage += (str(D)+"("+str(shortage_cost)+" Rs"+")")
+        else:
+            no_of_times_shortage += (" ,"+str(D)+"("+str(number)+" times"+")")
+            cost_shortage += (" ,"+str(D)+"("+str(shortage_cost)+" Rs"+")")
+        total_shortage_cost += shortage_cost
+
+
+
+
+
+# Transportation cost and Ordering Costs
 no_of_times_M = ""
 cost_M = ""
+ordering_cost_M = ""
 total_cost_M = 0
+total_ordering_cost_M = 0
 for M in manufacturers:
     number = 0
     cost = 0
+    ordering_cost = 0
     for G in gmsd:
         for T in time:
             number =  number + Xgmt[T,M,G].x
             cost = cost + Kgmt[T-1][M-1][G-1]*Ngmt[T,M,G].x
+            ordering_cost += Cgmt[T-1][M-1][G-1]*Xgmt[T,M,G].x
     if(number!=0):
         if(no_of_times_M==""):
             no_of_times_M += (str(M)+"("+str(number)+" times"+")")
             cost_M += (str(M)+"("+str(cost)+" Rs"+")")
+            ordering_cost_M += (str(M)+"("+str(ordering_cost)+" Rs"+")")
         else:
             no_of_times_M += (", "+str(M)+"("+str(number)+" times"+")")
             cost_M += (", "+str(M)+"("+str(cost)+" Rs"+")")
+            ordering_cost_M += (", "+str(M)+"("+str(ordering_cost)+" Rs"+")")
         total_cost_M += cost
+        total_ordering_cost_M += ordering_cost_M
 
 
 no_of_times_G = ""
 cost_G = ""
+ordering_cost_G = ""
 total_cost_G = 0
+total_ordering_cost_G = 0
 for G in gmsd:
     number = 0
     cost = 0
+    ordering_cost = 0
     for S in svs:
         for T in time:
             number =  number + Xsgt[T,G,S].x
             cost = cost + Ksgt[T-1][G-1][S-1]*Nsgt[T,G,S].x
+            ordering_cost += Csgt[T-1][G-1][S-1]*Xsgt[T,G,S].x
     if(number!=0):
         if(no_of_times_G==""):
             no_of_times_G += (str(G)+"("+str(number)+" times"+")")
             cost_G += (str(G)+"("+str(cost)+" Rs"+")")
+            ordering_cost_G += (str(G)+"("+str(ordering_cost)+" Rs"+")")
         else:
             no_of_times_G += (", "+str(G)+"("+str(number)+" times"+")")
             cost_G += (", "+str(G)+"("+str(cost)+" Rs"+")")
+            ordering_cost_G += (", "+str(G)+"("+str(ordering_cost)+" Rs"+")")
         total_cost_G += cost
+        total_ordering_cost_G += ordering_cost_G
 
 
 no_of_times_S = ""
 cost_S = ""
+ordering_cost_S = ""
 total_cost_S = 0
+total_ordering_cost_S = 0
 for S in svs:
     number = 0
     cost = 0
+    ordering_cost = 0
     for R in dvs:
         for T in time:
             number =  number + Xrst[T,S,R].x
             cost = cost + Krst[T-1][S-1][R-1]*Nrst[T,S,R].x
+            ordering_cost += Crst[T-1][S-1][R-1]*Xrst[T,S,R].x
     if(number!=0):
         if(no_of_times_S==""):
             no_of_times_S += (str(S)+"("+str(number)+" times"+")")
             cost_S += (str(S)+"("+str(cost)+" Rs"+")")
+            ordering_cost_S += (str(S)+"("+str(ordering_cost)+" Rs"+")")
         else:
             no_of_times_S += (", "+str(S)+"("+str(number)+" times"+")")
             cost_S += (", "+str(S)+"("+str(cost)+" Rs"+")")
+            ordering_cost_S += (", "+str(S)+"("+str(ordering_cost)+" Rs"+")")
         total_cost_S += cost
+        total_ordering_cost_S += ordering_cost_S
 
 
 no_of_times_R = ""
 cost_R = ""
+ordering_cost_R = ""
 total_cost_R = 0
+total_ordering_cost_R = 0
 for R in rvs:
     number = 0
     cost = 0
+    ordering_cost = 0
     for D in dvs:
         for T in time:
             number =  number + Xdrt[T,R,D].x
             cost = cost + Kdrt[T-1][R-1][D-1]*Ndrt[T,R,D].x
+            ordering_cost += Cdrt[T-1][R-1][D-1]*Xdrt[T,R,D].x
     if(number!=0):
         if(no_of_times_R==""):
             no_of_times_R += (str(R)+"("+str(number)+" times"+")")
             cost_R += (str(R)+"("+str(cost)+" Rs"+")")
+            ordering_cost_R += (str(R)+"("+str(ordering_cost)+" Rs"+")")
         else:
             no_of_times_R += (", "+str(R)+"("+str(number)+" times"+")")
             cost_R += (", "+str(R)+"("+str(cost)+" Rs"+")")
+            ordering_cost_R += (", "+str(R)+"("+str(ordering_cost)+" Rs"+")")
         total_cost_R += cost
+        total_ordering_cost_R += ordering_cost_R
         
 no_of_times_D = ""
 cost_D = ""
+ordering_cost_D = ""
 total_cost_D = 0
+total_ordering_cost_D = 0
 for D in dvs:
     number = 0
     cost = 0
+    ordering_cost = 0
     for I in clinics:
         for T in time:
             number =  number + Xidt[T,D,I].x
             cost = cost + Kidt[T-1][D-1][I-1]*Nidt[T,D,I].x
+            ordering_cost += Cidt[T-1][D-1][I-1]*Xidt[T,D,I].x
     if(number!=0):
         if(no_of_times_D==""):
             no_of_times_D += (str(D)+"("+str(number)+" times"+")")
             cost_D += (str(D)+"("+str(cost)+" Rs"+")")
+            ordering_cost_D += (str(D)+"("+str(ordering_cost)+" Rs"+")")
         else:
             no_of_times_D += (", "+str(D)+"("+str(number)+" times"+")")
             cost_D += (", "+str(D)+"("+str(cost)+" Rs"+")")
+            ordering_cost_D += (", "+str(D)+"("+str(ordering_cost)+" Rs"+")")
         total_cost_D += cost
+        total_ordering_cost_D += ordering_cost_D
 
 
 transport_part = {
@@ -553,6 +621,11 @@ transport_part = {
     "Total Cost":[total_cost_M,total_cost_G,total_cost_S,total_cost_R,total_cost_D]
 }
 
-
+ordering_part = {
+    "From":["M->G","G->S","S->R","R->D","D->I"],
+    "Number of times ordering happens over the entire planning horizon":[no_of_times_M,no_of_times_G,no_of_times_S,no_of_times_R,no_of_times_D],
+    "Ordering Cost Incurred":[ordering_cost_M,ordering_cost_G,ordering_cost_S,ordering_cost_R,ordering_cost_D],
+    "Total Cost":[total_ordering_cost_M,total_ordering_cost_G,total_ordering_cost_S,total_ordering_cost_R,total_ordering_cost_D]
+}
 
 
