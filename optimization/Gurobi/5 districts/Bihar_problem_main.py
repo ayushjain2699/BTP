@@ -554,6 +554,132 @@ transport_summary = {
     "Total Cost":[total_cost_M,total_cost_G,total_cost_S,total_cost_R,total_cost_D]
 }
 
+
+################ ordering part ##############
+
+average_quantity_M = ""
+cost_M = ""
+total_cost_M = 0
+for M in manufacturers:
+    number = 0
+    cost = 0
+    quantity = 0
+    for G in gmsd:
+        for T in time:
+            number =  number + Xgmt[T,M,G].x
+            cost = cost + Cgmt[T-1][M-1][G-1]*Qgmt[T,M,G].x
+            quantity = quantity + Qgmt[T,M,G].x
+    if(number!=0):
+    	average_quantity = quantity/number
+        if(average_quuantity_M==""):
+            average_quantity_M += (str(M)+"("+str(average_quantity)+" units"+")")
+            cost_M += (str(M)+"("+str(cost)+" Rs"+")")
+        else:
+            average_quantity_M += (", "+str(M)+"("+str(average_quantity)+" units"+")")
+            cost_M += (", "+str(M)+"("+str(cost)+" Rs"+")")
+        total_cost_M += cost
+
+
+average_quantity_G = ""
+cost_G = ""
+total_cost_G = 0
+for G in gmsd:
+    number = 0
+    cost = 0
+    quantity = 0
+    for S in svs:
+        for T in time:
+            number =  number + Xsgt[T,G,S].x
+            cost = cost + Csgt[T-1][G-1][S-1]*Qsgt[T,G,S].x
+            quantity = quantity + Qsgt[T,G,S].x
+    if(number!=0):
+    	average_quantity = quantity/number
+        if(average_quantity_G==""):
+            average_quantity_G += (str(G)+"("+str(average_quantity)+" units"+")")
+            cost_G += (str(G)+"("+str(cost)+" Rs"+")")
+        else:
+            average_quantity_G += (", "+str(G)+"("+str(average_quantity)+" units"+")")
+            cost_G += (", "+str(G)+"("+str(cost)+" Rs"+")")
+        total_cost_G += cost
+
+
+average_quantity_S = ""
+cost_S = ""
+total_cost_S = 0
+for S in svs:
+    number = 0
+    cost = 0
+    quantity = 0
+    for R in dvs:
+        for T in time:
+            number =  number + Xrst[T,S,R].x
+            cost = cost + Crst[T-1][S-1][R-1]*Qrst[T,S,R].x
+            quantity = quantity + Qrst[T,S,R].x
+    if(number!=0):
+    	average_quantity = quantity/number
+        if(average_quantity_S==""):
+            average_quantity_S += (str(S)+"("+str(average_quantity)+" units"+")")
+            cost_S += (str(S)+"("+str(cost)+" Rs"+")")
+        else:
+            average_quantity_S += (", "+str(S)+"("+str(average_quantity)+" units"+")")
+            cost_S += (", "+str(S)+"("+str(cost)+" Rs"+")")
+        total_cost_S += cost
+
+
+average_quantity_R = ""
+cost_R = ""
+total_cost_R = 0
+for R in rvs:
+    number = 0
+    cost = 0
+    quantity = 0
+    for D in dvs:
+        for T in time:
+            number =  number + Xdrt[T,R,D].x
+            cost = cost + Cdrt[T-1][R-1][D-1]*Qdrt[T,R,D].x
+            quantity = quantity + Qdrt[T,R,D].x
+    if(number!=0):
+    	average_quantity = quantity/number
+        if(average_quantity_R==""):
+            average_quantity_R += (str(R)+"("+str(average_quantity)+" units"+")")
+            cost_R += (str(R)+"("+str(cost)+" Rs"+")")
+        else:
+            average_quantity_R += (", "+str(R)+"("+str(average_quantity)+" units"+")")
+            cost_R += (", "+str(R)+"("+str(cost)+" Rs"+")")
+        total_cost_R += cost
+
+average_quantity_D = ""
+cost_D = ""
+total_cost_D = 0
+for D in dvs:
+    number = 0
+    cost = 0
+    quantity = 0
+    for I in clinics:
+        for T in time:
+            number =  number + Xidt[T,D,I].x
+            cost = cost + Cidt[T-1][D-1][I-1]*Qidt[T,D,I].x
+            quantity = quantity + Qidt[T,D.I].x
+    if(number!=0):
+    	average_quantity = quantity/number
+        if(average_quantity_D==""):
+            average_quantity_D += (str(D)+"("+str(average_quantity)+" units"+")")
+            cost_D += (str(D)+"("+str(cost)+" Rs"+")")
+        else:
+            average_quantity_D += (", "+str(D)+"("+str(average_quantity)+" units"+")")
+            cost_D += (", "+str(D)+"("+str(cost)+" Rs"+")")
+        total_cost_D += cost
+
+
+ordering_summary = {
+    "From":["M->G","G->S","S->R","R->D","D->I"],
+    "Average quantities ordered over the entire planning horizon":[average_quantity_M,average_quantity_G,average_quantity_S,average_quantity_R,average_quantity_D],
+    "Cost Incurred":[cost_M,cost_G,cost_S,cost_R,cost_D],
+    "Total Cost":[total_cost_M,total_cost_G,total_cost_S,total_cost_R,total_cost_D]
+}
+
+
+
 ################ inventory part #############
 no_of_times_G = ""
 avg_inv_G = ""
@@ -729,3 +855,88 @@ inventory_summary = {
     "Cost Incurred":[cost_G,cost_S,cost_R,cost_D,cost_I],
     "Total Cost":[total_cost_G,total_cost_S,total_cost_R,total_cost_D,total_cost_I]
 }
+
+
+########################### Shortages summary ##############################
+
+#For district 1
+I_s = 1
+num_clinics_1 = 10
+cost_1 = 0
+avg_cost_1 = 0
+
+for x in range(num_clinics_1):
+	I = I_s + x
+	for J in customers:
+		for T in time:
+			if(Sijt[T,J,I]!=0):
+				cost_1 += Pjt[T-1][J-1]*Sijt[T,J,I].x
+avg_cost_1 = cost_1/num_clinics_1
+
+#For district 2
+I_s = 11
+num_clinics_2 = 6
+cost_2 = 0
+avg_cost_2 = 0
+
+for x in range(num_clinics_2):
+	I = I_s + x
+	for J in customers:
+		for T in time:
+			if(Sijt[T,J,I]!=0):
+				cost_2 += Pjt[T-1][J-1]*Sijt[T,J,I].x
+avg_cost_2 = cost_2/num_clinics_2
+
+
+#For district 3
+I_s = 17
+num_clinics_3 = 12
+cost_3 = 0
+avg_cost_3 = 0
+
+for x in range(num_clinics_3):
+	I = I_s + x
+	for J in customers:
+		for T in time:
+			if(Sijt[T,J,I]!=0):
+				cost_3 += Pjt[T-1][J-1]*Sijt[T,J,I].x
+avg_cost_3 = cost_3/num_clinics_3
+
+
+#For district 4
+I_s = 29
+num_clinics_4 = 12
+cost_4 = 0
+avg_cost_4 = 0
+
+for x in range(num_clinics_4):
+	I = I_s + x
+	for J in customers:
+		for T in time:
+			if(Sijt[T,J,I]!=0):
+				cost_4 += Pjt[T-1][J-1]*Sijt[T,J,I].x
+avg_cost_4 = cost_4/num_clinics_4
+
+
+#For district 5
+I_s = 41
+num_clinics_5 = 19
+cost_5 = 0
+avg_cost_5 = 0
+
+for x in range(num_clinics_5):
+	I = I_s + x
+	for J in customers:
+		for T in time:
+			if(Sijt[T,J,I]!=0):
+				cost_5 += Pjt[T-1][J-1]*Sijt[T,J,I].x
+avg_cost_5 = cost_5/num_clinics_5
+
+shortage_summary = {
+    "CCP": ["1","2","3","4","5"],
+    "Number of clinics":[num_clinics_1,num_clinics_2,num_clinics_3,num_clinics_4,num_clinics_5],
+    "Total shortage cost Incurred":[cost_1,cost_2,cost_3,cost_4,cost_5],
+    "Average shortage cost incurred per clinic":[avg_cost_1,avg_cost_2,avg_cost_3,avg_cost_4,avg_cost_5]
+}
+
+################################################# The End ######################################################### 
