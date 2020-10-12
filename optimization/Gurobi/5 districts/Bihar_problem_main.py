@@ -695,20 +695,19 @@ for G in gmsd:
             total_inventory_G += Igt[T,G].x
             cost += hgt[T-1][G-1]*Igt[T,G].x
     cost = round(cost)
-    if(no_of_times_G==""):
-        no_of_times_G += (str(G)+"("+str(number)+" times"+")")
-        cost_G += (str(G)+"("+str(cost)+" Rs"+")")
-        if(number!=0):
+    if(number!=0):
+        if(no_of_times_G==""):
+            no_of_times_G += (str(G)+"("+str(number)+" times"+")")
+            cost_G += (str(G)+"("+str(cost)+" Rs"+")")
             avg_inv_G += (str(G)+"("+str(total_inventory_G/number)+" units"+")")
+
         else:
-            avg_inv_G += (str(G)+"("+str(0)+" units"+")")
-    else:
-        no_of_times_G += (", "+str(G)+"("+str(number)+" times"+")")
-        cost_G += (", "+str(G)+"("+str(cost)+" Rs"+")")
-        if(number!=0):
-            avg_inv_G += (", "+str(G)+"("+str(total_inventory_G/number)+" units"+")")
-        else:
-            avg_inv_G += (", "+str(G)+"("+str(0)+" units"+")")
+            no_of_times_G += (", "+str(G)+"("+str(number)+" times"+")")
+            cost_G += (", "+str(G)+"("+str(cost)+" Rs"+")")
+            if(number!=0):
+                avg_inv_G += (", "+str(G)+"("+str(total_inventory_G/number)+" units"+")")
+            else:
+                avg_inv_G += (", "+str(G)+"("+str(0)+" units"+")")
     total_cost_G += cost
         
 
@@ -726,20 +725,19 @@ for S in svs:
             total_inventory_G += Ist[T,S].x
             cost += hst[T-1][S-1]*Ist[T,S].x
     cost = round(cost)
-    if(no_of_times_S==""):
-        no_of_times_S += (str(S)+"("+str(number)+" times"+")")
-        cost_S += (str(S)+"("+str(cost)+" Rs"+")")
-        if(number!=0):
+    if(number!=0):
+        if(no_of_times_S==""):
+            no_of_times_S += (str(S)+"("+str(number)+" times"+")")
+            cost_S += (str(S)+"("+str(cost)+" Rs"+")")
             avg_inv_S += (str(S)+"("+str(total_inventory_S/number)+" units"+")")
+    
         else:
-            avg_inv_S += (str(S)+"("+str(0)+" units"+")")
-    else:
-        no_of_times_S += (", "+str(S)+"("+str(number)+" times"+")")
-        cost_S += (", "+str(S)+"("+str(cost)+" Rs"+")")
-        if(number!=0):
-            avg_inv_S += (", "+str(S)+"("+str(total_inventory_S/number)+" units"+")") 
-        else: 
-            avg_inv_S += (", "+str(S)+"("+str(0)+" units"+")") 
+            no_of_times_S += (", "+str(S)+"("+str(number)+" times"+")")
+            cost_S += (", "+str(S)+"("+str(cost)+" Rs"+")")
+            if(number!=0):
+                avg_inv_S += (", "+str(S)+"("+str(total_inventory_S/number)+" units"+")") 
+            else: 
+                avg_inv_S += (", "+str(S)+"("+str(0)+" units"+")") 
     total_cost_S += cost
 
 
@@ -757,20 +755,21 @@ for R in rvs:
             total_inventory_R += Irt[T,R].x
             cost += hrt[T-1][R-1]*Irt[T,R].x
     cost = round(cost)
-    if(no_of_times_R==""):
-        no_of_times_R += (str(R)+"("+str(number)+" times"+")")
-        cost_R += (str(R)+"("+str(cost)+" Rs"+")")
-        if(number!=0):
-            avg_inv_R += (str(R)+"("+str(total_inventory_R/number)+" units"+")")
+    if(number!=0):
+        if(no_of_times_R==""):
+            no_of_times_R += (str(R)+"("+str(number)+" times"+")")
+            cost_R += (str(R)+"("+str(cost)+" Rs"+")")
+            if(number!=0):
+                avg_inv_R += (str(R)+"("+str(total_inventory_R/number)+" units"+")")
+            else:
+                avg_inv_R += (str(R)+"("+str(0)+" units"+")")
         else:
-            avg_inv_R += (str(R)+"("+str(0)+" units"+")")
-    else:
-        no_of_times_R += (", "+str(R)+"("+str(number)+" times"+")")
-        cost_R += (", "+str(R)+"("+str(cost)+" Rs"+")")
-        if(number!=0):
-            avg_inv_R += (", "+str(R)+"("+str(total_inventory_R/number)+" units"+")")
-        else:  
-            avg_inv_R += (", "+str(R)+"("+str(0)+" units"+")")
+            no_of_times_R += (", "+str(R)+"("+str(number)+" times"+")")
+            cost_R += (", "+str(R)+"("+str(cost)+" Rs"+")")
+            if(number!=0):
+                avg_inv_R += (", "+str(R)+"("+str(total_inventory_R/number)+" units"+")")
+            else:  
+                avg_inv_R += (", "+str(R)+"("+str(0)+" units"+")")
     total_cost_R += cost
 
 
@@ -788,20 +787,21 @@ for D in dvs:
             total_inventory_D += Idt[T,D].x
             cost += hdt[T-1][D-1]*Idt[T,D].x
     cost = round(cost)
-    if(no_of_times_D==""):
-            no_of_times_D += (str(D)+"("+str(number)+" times"+")")
-            cost_D += (str(D)+"("+str(cost)+" Rs"+")")
-            if(number!=0):
-                avg_inv_D += (str(D)+"("+str(total_inventory_D/number)+" units"+")")
-            else:
-                avg_inv_D += (str(D)+"("+str(0)+" units"+")")
-    else:
-        no_of_times_D += (", "+str(D)+"("+str(number)+" times"+")")
-        cost_D += (", "+str(D)+"("+str(cost)+" Rs"+")")
-        if(number!=0):
-            avg_inv_D += (", "+str(D)+"("+str(total_inventory_D/number)+" units"+")")  
+    if(number!=0):
+        if(no_of_times_D==""):
+                no_of_times_D += (str(D)+"("+str(number)+" times"+")")
+                cost_D += (str(D)+"("+str(cost)+" Rs"+")")
+                if(number!=0):
+                    avg_inv_D += (str(D)+"("+str(total_inventory_D/number)+" units"+")")
+                else:
+                    avg_inv_D += (str(D)+"("+str(0)+" units"+")")
         else:
-            avg_inv_D += (", "+str(D)+"("+str(0)+" units"+")")
+            no_of_times_D += (", "+str(D)+"("+str(number)+" times"+")")
+            cost_D += (", "+str(D)+"("+str(cost)+" Rs"+")")
+            if(number!=0):
+                avg_inv_D += (", "+str(D)+"("+str(total_inventory_D/number)+" units"+")")  
+            else:
+                avg_inv_D += (", "+str(D)+"("+str(0)+" units"+")")
     total_cost_D += cost
 
 
