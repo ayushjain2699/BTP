@@ -610,7 +610,7 @@ for S in svs:
     number = 0
     cost = 0
     quantity = 0
-    for R in dvs:
+    for R in rvs:
         for T in time:
             number =  number + Xrst[T,S,R].x
             cost = cost + Crst[T-1][S-1][R-1]*Qrst[T,S,R].x
@@ -873,7 +873,7 @@ for x in range(num_clinics_1):
 	I = I_s + x
 	for J in customers:
 		for T in time:
-			if(Sijt[T,J,I]!=0):
+			if(Sijt[T,J,I].x!=0):
 				cost_1 += Pjt[T-1][J-1]*Sijt[T,J,I].x
 avg_cost_1 = cost_1/num_clinics_1
 
@@ -887,7 +887,7 @@ for x in range(num_clinics_2):
 	I = I_s + x
 	for J in customers:
 		for T in time:
-			if(Sijt[T,J,I]!=0):
+			if(Sijt[T,J,I].x!=0):
 				cost_2 += Pjt[T-1][J-1]*Sijt[T,J,I].x
 avg_cost_2 = cost_2/num_clinics_2
 
@@ -902,7 +902,7 @@ for x in range(num_clinics_3):
 	I = I_s + x
 	for J in customers:
 		for T in time:
-			if(Sijt[T,J,I]!=0):
+			if(Sijt[T,J,I].x!=0):
 				cost_3 += Pjt[T-1][J-1]*Sijt[T,J,I].x
 avg_cost_3 = cost_3/num_clinics_3
 
@@ -917,7 +917,7 @@ for x in range(num_clinics_4):
 	I = I_s + x
 	for J in customers:
 		for T in time:
-			if(Sijt[T,J,I]!=0):
+			if(Sijt[T,J,I].x!=0):
 				cost_4 += Pjt[T-1][J-1]*Sijt[T,J,I].x
 avg_cost_4 = cost_4/num_clinics_4
 
@@ -932,7 +932,7 @@ for x in range(num_clinics_5):
 	I = I_s + x
 	for J in customers:
 		for T in time:
-			if(Sijt[T,J,I]!=0):
+			if(Sijt[T,J,I].x!=0):
 				cost_5 += Pjt[T-1][J-1]*Sijt[T,J,I].x
 avg_cost_5 = cost_5/num_clinics_5
 
