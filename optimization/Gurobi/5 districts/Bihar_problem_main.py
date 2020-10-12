@@ -285,7 +285,7 @@ for v in model.getVars():
     #print(v.varName,"=", v.x)
     names.append(v.varName)
     sol.append(v.x)
-
+print("Done")
 
 ###########################Code for generating CSV files for graphical analysis################## 
 
@@ -494,7 +494,7 @@ total_cost_S = 0
 for S in svs:
     number = 0
     cost = 0
-    for R in dvs:
+    for R in rvs:
         for T in time:
             number =  number + Xrst[T,S,R].x
             cost = cost + Krst[T-1][S-1][R-1]*Nrst[T,S,R].x
@@ -571,7 +571,7 @@ for M in manufacturers:
             quantity = quantity + Qgmt[T,M,G].x
     if(number!=0):
     	average_quantity = quantity/number
-        if(average_quuantity_M==""):
+        if(average_quantity_M==""):
             average_quantity_M += (str(M)+"("+str(average_quantity)+" units"+")")
             cost_M += (str(M)+"("+str(cost)+" Rs"+")")
         else:
@@ -690,10 +690,11 @@ for G in gmsd:
     cost = 0
     total_inventory_G = 0
     for T in time:
-        if(Igt[T][G].x>0):
+        if(Igt[T,G].x>0):
             number += 1
-            total_inventory_G += Igt[T][G].x
-            cost += hgt[T-1][G-1]*Igt[T][G].x
+            total_inventory_G += Igt[T,G].x
+            cost += hgt[T-1][G-1]*Igt[T,G].x
+    cost = round(cost)
     if(no_of_times_G==""):
         no_of_times_G += (str(G)+"("+str(number)+" times"+")")
         cost_G += (str(G)+"("+str(cost)+" Rs"+")")
@@ -720,10 +721,11 @@ for S in svs:
     cost = 0
     total_inventory_S = 0
     for T in time:
-        if(Ist[T][S].x>0):
+        if(Ist[T,S].x>0):
             number += 1
-            total_inventory_G += Ist[T][S].x
-            cost += hst[T-1][S-1]*Ist[T][S].x
+            total_inventory_G += Ist[T,S].x
+            cost += hst[T-1][S-1]*Ist[T,S].x
+    cost = round(cost)
     if(no_of_times_S==""):
         no_of_times_S += (str(S)+"("+str(number)+" times"+")")
         cost_S += (str(S)+"("+str(cost)+" Rs"+")")
@@ -750,10 +752,11 @@ for R in rvs:
     cost = 0
     total_inventory_R = 0
     for T in time:
-        if(Irt[T][R].x>0):
+        if(Irt[T,R].x>0):
             number += 1
-            total_inventory_R += Irt[T][R].x
-            cost += hrt[T-1][R-1]*Irt[T][R].x
+            total_inventory_R += Irt[T,R].x
+            cost += hrt[T-1][R-1]*Irt[T,R].x
+    cost = round(cost)
     if(no_of_times_R==""):
         no_of_times_R += (str(R)+"("+str(number)+" times"+")")
         cost_R += (str(R)+"("+str(cost)+" Rs"+")")
@@ -780,10 +783,11 @@ for D in dvs:
     cost = 0
     total_inventory_D = 0
     for T in time:
-        if(Idt[T][D].x>0):
+        if(Idt[T,D].x>0):
             number += 1
-            total_inventory_D += Idt[T][D].x
-            cost += hdt[T-1][D-1]*Idt[T][D].x
+            total_inventory_D += Idt[T,D].x
+            cost += hdt[T-1][D-1]*Idt[T,D].x
+    cost = round(cost)
     if(no_of_times_D==""):
             no_of_times_D += (str(D)+"("+str(number)+" times"+")")
             cost_D += (str(D)+"("+str(cost)+" Rs"+")")
@@ -817,10 +821,10 @@ for I_b in clinic_breakpoints:
         cost = 0
         total_inventory_I = 0
         for T in time:
-            if(Iit[T][I].x>0):
+            if(Iit[T,I].x>0):
                 number += 1
-                total_inventory_I += Iit[T][I].x
-                cost += hit[T-1][I-1]*Iit[T][I].x
+                total_inventory_I += Iit[T,I].x
+                cost += hit[T-1][I-1]*Iit[T,I].x
         number_average_district += number
         if(number!=0):
             avg_inv_avg_district += total_inventory_I/number
