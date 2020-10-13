@@ -576,7 +576,7 @@ for M in manufacturers:
             quantity = quantity + Qgmt[T,M,G].x
     cost = round(cost)
     if(number!=0):
-    	average_quantity = quantity/number
+        average_quantity = quantity/number
         if(average_quantity_M==""):
             average_quantity_M += (str(M)+"("+str(average_quantity)+" units"+")")
             cost_M += (str(M)+"("+str(cost)+" Rs"+")")
@@ -600,7 +600,7 @@ for G in gmsd:
             quantity = quantity + Qsgt[T,G,S].x
     cost = round(cost)
     if(number!=0):
-    	average_quantity = quantity/number
+        average_quantity = quantity/number
         if(average_quantity_G==""):
             average_quantity_G += (str(G)+"("+str(average_quantity)+" units"+")")
             cost_G += (str(G)+"("+str(cost)+" Rs"+")")
@@ -624,7 +624,7 @@ for S in svs:
             quantity = quantity + Qrst[T,S,R].x
     cost = round(cost)
     if(number!=0):
-    	average_quantity = quantity/number
+        average_quantity = quantity/number
         if(average_quantity_S==""):
             average_quantity_S += (str(S)+"("+str(average_quantity)+" units"+")")
             cost_S += (str(S)+"("+str(cost)+" Rs"+")")
@@ -648,7 +648,7 @@ for R in rvs:
             quantity = quantity + Qdrt[T,R,D].x
     cost = round(cost)
     if(number!=0):
-    	average_quantity = quantity/number
+        average_quantity = quantity/number
         if(average_quantity_R==""):
             average_quantity_R += (str(R)+"("+str(average_quantity)+" units"+")")
             cost_R += (str(R)+"("+str(cost)+" Rs"+")")
@@ -668,10 +668,10 @@ for D in dvs:
         for T in time:
             number =  number + Xidt[T,D,I].x
             cost = cost + Cidt[T-1][D-1][I-1]*Qidt[T,D,I].x
-            quantity = quantity + Qidt[T,D.I].x
+            quantity = quantity + Qidt[T,D,I].x
     cost = round(cost)
     if(number!=0):
-    	average_quantity = quantity/number
+        average_quantity = quantity/number
         if(average_quantity_D==""):
             average_quantity_D += (str(D)+"("+str(average_quantity)+" units"+")")
             cost_D += (str(D)+"("+str(cost)+" Rs"+")")
