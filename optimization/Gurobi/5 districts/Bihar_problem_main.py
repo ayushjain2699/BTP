@@ -27,8 +27,8 @@ time = list(range(1,t+1))
 
 ########################### PARAMETERS ################################
 l = GRB.INFINITY #large number for consistency constraints
-fraction_storage = 0.1 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
-fraction_transport = 0.1 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
+fraction_storage = 0.4 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
+fraction_transport = 0.4 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
 
 #Transportation cost
 diesel_cost = 14
@@ -68,11 +68,11 @@ for index in df_Did.index:
 	Did[df_Did['d'][index]-1][df_Did['i'][index]-1] = df_Did['Distance'][index]
 
 #Capacity of trucks
-cap_veh_gm = fraction_transport*2932075 #Refrigerated van
-cap_veh_sg = fraction_transport*2932075 #Refrigerated van
-cap_veh_rs = fraction_transport*290880 #Insulated van
-cap_veh_dr = fraction_transport*290880 #Insulated van
-cap_veh_id = fraction_transport*290880 #Insulated van
+cap_veh_gm = round(fraction_transport*2932075) #Refrigerated van
+cap_veh_sg = round(fraction_transport*2932075) #Refrigerated van
+cap_veh_rs = round(fraction_transport*290880) #Insulated van
+cap_veh_dr = round(fraction_transport*290880) #Insulated van
+cap_veh_id = round(fraction_transport*290880) #Insulated van
 
 
 #Final transportation costs
@@ -116,8 +116,8 @@ for index in df_demand.index:
 	dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = df_demand['demand'][index]
 
 #Capacity of cold chain points
-Bgt = [[fraction_storage*24545455 for G in range(g)] for T in range(t)]
-Bst = [[fraction_storage*6818182 for S in range(s)] for T in range(t)]
+Bgt = [[round(fraction_storage*24545455) for G in range(g)] for T in range(t)]
+Bst = [[round(fraction_storage*6818182) for S in range(s)] for T in range(t)]
 
 df_brt = pd.read_csv("Input_data/capacity_RVS.csv")
 Brt = [[0 for R in range(r)] for T in range(t)]
@@ -458,6 +458,7 @@ for M in manufacturers:
         for T in time:
             number =  number + Xgmt[T,M,G].x
             cost = cost + Kgmt[T-1][M-1][G-1]*Ngmt[T,M,G].x
+    cost = round(cost)
     if(number!=0):
         if(no_of_times_M==""):
             no_of_times_M += (str(M)+"("+str(number)+" times"+")")
@@ -478,6 +479,7 @@ for G in gmsd:
         for T in time:
             number =  number + Xsgt[T,G,S].x
             cost = cost + Ksgt[T-1][G-1][S-1]*Nsgt[T,G,S].x
+    cost = round(cost)
     if(number!=0):
         if(no_of_times_G==""):
             no_of_times_G += (str(G)+"("+str(number)+" times"+")")
@@ -498,6 +500,7 @@ for S in svs:
         for T in time:
             number =  number + Xrst[T,S,R].x
             cost = cost + Krst[T-1][S-1][R-1]*Nrst[T,S,R].x
+    cost = round(cost)
     if(number!=0):
         if(no_of_times_S==""):
             no_of_times_S += (str(S)+"("+str(number)+" times"+")")
@@ -518,6 +521,7 @@ for R in rvs:
         for T in time:
             number =  number + Xdrt[T,R,D].x
             cost = cost + Kdrt[T-1][R-1][D-1]*Ndrt[T,R,D].x
+    cost = round(cost)
     if(number!=0):
         if(no_of_times_R==""):
             no_of_times_R += (str(R)+"("+str(number)+" times"+")")
@@ -537,6 +541,7 @@ for D in dvs:
         for T in time:
             number =  number + Xidt[T,D,I].x
             cost = cost + Kidt[T-1][D-1][I-1]*Nidt[T,D,I].x
+    cost = round(cost)
     if(number!=0):
         if(no_of_times_D==""):
             no_of_times_D += (str(D)+"("+str(number)+" times"+")")
@@ -569,6 +574,7 @@ for M in manufacturers:
             number =  number + Xgmt[T,M,G].x
             cost = cost + Cgmt[T-1][M-1][G-1]*Qgmt[T,M,G].x
             quantity = quantity + Qgmt[T,M,G].x
+    cost = round(cost)
     if(number!=0):
     	average_quantity = quantity/number
         if(average_quantity_M==""):
@@ -592,6 +598,7 @@ for G in gmsd:
             number =  number + Xsgt[T,G,S].x
             cost = cost + Csgt[T-1][G-1][S-1]*Qsgt[T,G,S].x
             quantity = quantity + Qsgt[T,G,S].x
+    cost = round(cost)
     if(number!=0):
     	average_quantity = quantity/number
         if(average_quantity_G==""):
@@ -615,6 +622,7 @@ for S in svs:
             number =  number + Xrst[T,S,R].x
             cost = cost + Crst[T-1][S-1][R-1]*Qrst[T,S,R].x
             quantity = quantity + Qrst[T,S,R].x
+    cost = round(cost)
     if(number!=0):
     	average_quantity = quantity/number
         if(average_quantity_S==""):
@@ -638,6 +646,7 @@ for R in rvs:
             number =  number + Xdrt[T,R,D].x
             cost = cost + Cdrt[T-1][R-1][D-1]*Qdrt[T,R,D].x
             quantity = quantity + Qdrt[T,R,D].x
+    cost = round(cost)
     if(number!=0):
     	average_quantity = quantity/number
         if(average_quantity_R==""):
@@ -660,6 +669,7 @@ for D in dvs:
             number =  number + Xidt[T,D,I].x
             cost = cost + Cidt[T-1][D-1][I-1]*Qidt[T,D,I].x
             quantity = quantity + Qidt[T,D.I].x
+    cost = round(cost)
     if(number!=0):
     	average_quantity = quantity/number
         if(average_quantity_D==""):
@@ -942,5 +952,15 @@ shortage_summary = {
     "Total shortage cost Incurred":[cost_1,cost_2,cost_3,cost_4,cost_5],
     "Average shortage cost incurred per clinic":[avg_cost_1,avg_cost_2,avg_cost_3,avg_cost_4,avg_cost_5]
 }
+
+transport_df = pd.DataFrame.from_dict(transport_summary)
+inventory_df = pd.DataFrame.from_dict(inventory_summary)
+ordering_df = pd.DataFrame.from_dict(ordering_summary)
+shortage_df = pd.DataFrame.from_dict(shortage_summary)
+
+transport_df.to_excel("transport.xlsx")
+inventory_df.to_excel("inventory.xlsx")
+ordering_df.to_excel("ordering.xlsx")
+shortage_df.to_excel("shortage.xlsx")
 
 ################################################# The End ######################################################### 
