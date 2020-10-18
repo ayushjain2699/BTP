@@ -107,7 +107,7 @@ Cidt = [[[15000 for I in range(i)] for D in range(d)] for T in range(t)]
 #Demand
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
-df_demand = pd.read_csv("Input_data/demand_weekly.csv")
+df_demand = pd.read_csv("Input_data/weekly_demand.csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
 	if (df_demand['i'][index] > i):

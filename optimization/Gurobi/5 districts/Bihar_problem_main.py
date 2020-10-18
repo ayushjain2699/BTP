@@ -107,7 +107,7 @@ Cidt = [[[15000 for I in range(i)] for D in range(d)] for T in range(t)]
 #Demand
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
-df_demand = pd.read_csv("Input_data/demand_weekly.csv")
+df_demand = pd.read_csv("Input_data/weekly_demand.csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
 	if (df_demand['i'][index] > i):
@@ -146,6 +146,12 @@ model = gp.Model('Vaccine_Distribution')
 
 #Production Capacity
 Bmt = [[1000000 for M in range(m)] for T in range(t)]
+
+#Average time required to administer the vaccine (minutes)
+No = 5
+
+#Number of medical personnel hours available (minutes)
+Nit = [[480 for I in range(i)] for T in range(t)]
 
 ################### DECISION VARIABLES ##########################
 
@@ -275,6 +281,9 @@ num_trucks_7 = model.addConstrs((Qdrt[T,R,D]/cap_veh_dr<=Ndrt[T,R,D] for D in dv
 num_trucks_8 = model.addConstrs((Ndrt[T,R,D]-Qdrt[T,R,D]/cap_veh_dr<=((cap_veh_dr-1)/cap_veh_dr) for D in dvs for R in rvs for T in time),name = "num_trucks_8")
 num_trucks_9 = model.addConstrs((Qidt[T,D,I]/cap_veh_id<=Nidt[T,D,I] for I in clinics for D in dvs for T in time),name = "num_trucks_9")
 num_trucks_10 = model.addConstrs((Nidt[T,D,I]-Qidt[T,D,I]/cap_veh_id<=((cap_veh_id-1)/cap_veh_id) for I in clinics for D in dvs for T in time),name = "num_trucks_10")
+
+#Medical personnel availability constraints
+med_constraint = model.addConstrs((gp.quicksum(No*Wijt[T,J,I] for J in customers)<=Nit[T-1][I-1] for I in clinics for T in time),name = "med_constraint")
 
 #################################Solving the problem##########################
 model.optimize()
