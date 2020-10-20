@@ -296,6 +296,201 @@ for v in model.getVars():
     sol.append(v.x)
 print("Done")
 
+###########################Code for full excel sheet results generation##########################
+workbook = xlsxwriter.Workbook('fraction-1.xlsx')
+worksheet = workbook.add_worksheet()
+merge_format = workbook.add_format({
+    'bold': 1,
+    'border': 1,
+    'align': 'center',
+    'valign': 'vcenter'})
+
+worksheet.merge_range('A1:B1', 'Inventory', merge_format)
+worksheet.merge_range('C1:D1', 'Consumption', merge_format)
+worksheet.merge_range('E1:F1', 'Shortage', merge_format)
+worksheet.merge_range('G1:H1', 'Delivery from M to G', merge_format)
+worksheet.merge_range('I1:J1', 'X from M to G', merge_format)
+worksheet.merge_range('K1:L1', 'No of Trucks from M to G', merge_format)
+worksheet.merge_range('M1:N1', 'Distance from M to G', merge_format)
+worksheet.merge_range('O1:P1', 'Delivery from G to S', merge_format)
+worksheet.merge_range('Q1:R1', 'X from G to S', merge_format)
+worksheet.merge_range('S1:T1', 'No of Trucks from G to S', merge_format)
+worksheet.merge_range('U1:V1', 'Distance from G to S', merge_format)
+worksheet.merge_range('W1:X1', 'Delivery from S to R', merge_format)
+worksheet.merge_range('Y1:Z1', 'X from S to R', merge_format)
+worksheet.merge_range('AA1:AB1', 'No of Trucks from S to R', merge_format)
+worksheet.merge_range('AC1:AD1', 'Distance from S to R', merge_format)
+worksheet.merge_range('AE1:AF1', 'Delivery from R to D', merge_format)
+worksheet.merge_range('AG1:AH1', 'X from R to D', merge_format)
+worksheet.merge_range('AI1:AJ1', 'No of Trucks from R to D', merge_format)
+worksheet.merge_range('AK1:AL1', 'Distance from R to D', merge_format)
+worksheet.merge_range('AM1:AN1', 'Delivery from D to I', merge_format)
+worksheet.merge_range('AO1:AP1', 'X from D to I', merge_format)
+worksheet.merge_range('AQ1:AR1', 'No of Trucks from D to I', merge_format)
+worksheet.merge_range('AS1:AT1', 'Distance from D to I', merge_format)
+
+
+#Inventory
+row = 1
+for T in time:
+    for G in gmsd:
+        worksheet.write(row,0,Igt[T,G].varName)
+        worksheet.write(row,1,round(Igt[T,G].x))
+        row += 1
+
+for T in time:
+    for S in svs:
+        worksheet.write(row,0,Ist[T,S].varName)
+        worksheet.write(row,1,round(Ist[T,S].x))
+        row += 1
+
+for T in time:
+    for R in rvs:
+        worksheet.write(row,0,Irt[T,R].varName)
+        worksheet.write(row,1,round(Irt[T,R].x))
+        row += 1
+        
+for T in time:
+    for D in dvs:
+        worksheet.write(row,0,Idt[T,D].varName)
+        worksheet.write(row,1,round(Idt[T,D].x))
+        row += 1
+
+for T in time:
+    for I in clinics:
+        worksheet.write(row,0,Iit[T,I].varName)
+        worksheet.write(row,1,round(Iit[T,I].x))
+        row += 1
+
+#Qgmt, Xgmt, Ngmt
+row = 1
+for T in time:
+    for M in manufacturers:
+        for G in gmsd:
+            worksheet.write(row,6,Qgmt[T,M,G].varName)
+            worksheet.write(row,7,round(Qgmt[T,M,G].x))
+            worksheet.write(row,8,Xgmt[T,M,G].varName)
+            worksheet.write(row,9,round(Xgmt[T,M,G].x))
+            worksheet.write(row,10,Ngmt[T,M,G].varName)
+            worksheet.write(row,11,round(Ngmt[T,M,G].x))
+            row += 1
+#Dgm
+row = 1
+for M in manufacturers:
+    for G in gmsd:
+        variable = "Dgm["+str(M)+","+str(G)+"]"
+        worksheet.write(row,12,variable)
+        worksheet.write(row,13,Dgm[M-1][G-1])
+        row += 1
+        
+
+#Qsgt,Xsgt,Nsgt
+row = 1
+for T in time:
+    for G in gmsd:
+        for S in svs:
+            worksheet.write(row,14,Qsgt[T,G,S].varName)
+            worksheet.write(row,15,round(Qsgt[T,G,S].x))
+            worksheet.write(row,16,Xsgt[T,G,S].varName)
+            worksheet.write(row,17,round(Xsgt[T,G,S].x))
+            worksheet.write(row,18,Nsgt[T,G,S].varName)
+            worksheet.write(row,19,round(Nsgt[T,G,S].x))
+            row += 1
+#Dsg
+row = 1
+for G in gmsd:
+    for S in svs:
+        variable = "Dsg["+str(G)+","+str(S)+"]"
+        worksheet.write(row,20,variable)
+        worksheet.write(row,21,Dsg[G-1][S-1])
+        row += 1
+
+#Qrst,Xrst,Nrst
+row = 1
+for T in time:
+    for S in svs:
+        for R in rvs:
+            worksheet.write(row,22,Qrst[T,S,R].varName)
+            worksheet.write(row,23,round(Qrst[T,S,R].x))
+            worksheet.write(row,24,Xrst[T,S,R].varName)
+            worksheet.write(row,25,round(Xrst[T,S,R].x))
+            worksheet.write(row,26,Nrst[T,S,R].varName)
+            worksheet.write(row,27,round(Nrst[T,S,R].x))
+            row += 1
+#Drs
+row = 1
+for S in svs:
+    for R in rvs:
+        variable = "Drs["+str(S)+","+str(R)+"]"
+        worksheet.write(row,28,variable)
+        worksheet.write(row,29,Drs[S-1][R-1])
+        row += 1
+
+#Qdrt,Xdrt,Ndrt
+row = 1
+for T in time:
+    for R in rvs:
+        for D in dvs:
+            worksheet.write(row,30,Qdrt[T,R,D].varName)
+            worksheet.write(row,31,round(Qdrt[T,R,D].x))
+            worksheet.write(row,32,Xdrt[T,R,D].varName)
+            worksheet.write(row,33,round(Xdrt[T,R,D].x))
+            worksheet.write(row,34,Ndrt[T,R,D].varName)
+            worksheet.write(row,35,round(Ndrt[T,R,D].x))
+            row += 1
+#Ddr
+row = 1
+for R in rvs:
+    for D in dvs:
+        variable = "Ddr["+str(R)+","+str(D)+"]"
+        worksheet.write(row,36,variable)
+        worksheet.write(row,37,Ddr[R-1][D-1])
+        row += 1
+        
+#Qidt,Xidt,Nidt
+row = 1
+for T in time:
+    for D in dvs:
+        for I in clinics:
+            worksheet.write(row,38,Qidt[T,D,I].varName)
+            worksheet.write(row,39,round(Qidt[T,D,I].x))
+            worksheet.write(row,40,Xidt[T,D,I].varName)
+            worksheet.write(row,41,round(Xidt[T,D,I].x))
+            worksheet.write(row,42,Nidt[T,D,I].varName)
+            worksheet.write(row,43,round(Nidt[T,D,I].x))
+            row += 1
+#Did
+row = 1
+for D in dvs:
+    for I in clinics:
+        variable = "Did["+str(D)+","+str(I)+"]"
+        worksheet.write(row,44,variable)
+        worksheet.write(row,45,Did[D-1][I-1])
+        row += 1
+
+#Shortage
+row = 1
+for T in time:
+    for J in customers:
+        for I in clinics:
+            worksheet.write(row,4,Sijt[T,J,I].varName)
+            worksheet.write(row,5,round(Sijt[T,J,I].x))
+            row += 1
+
+
+#Consumption
+row = 1
+for T in time:
+    for J in customers:
+        for I in clinics:
+            worksheet.write(row,2,Wijt[T,J,I].varName)
+            worksheet.write(row,3,round(Wijt[T,J,I].x))
+            row += 1
+
+
+
+workbook.close()
+
 ###########################Code for generating CSV files for graphical analysis################## 
 
 import pandas as pd
