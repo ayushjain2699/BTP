@@ -941,7 +941,7 @@ for S in svs:
     for T in time:
         if(Ist[T,S].x>0):
             number += 1
-            total_inventory_G += Ist[T,S].x
+            total_inventory_S += Ist[T,S].x
             cost += hst[T-1][S-1]*Ist[T,S].x
     cost = round(cost)
     if(number!=0):
