@@ -863,7 +863,7 @@ for R in rvs:
             average_quantity_R += (str(R)+"("+str(round(average_quantity))+" units"+")")
             cost_R += (str(R)+"("+str(cost)+" Rs"+")")
         else:
-            average_quantity_R += (", "+str(R)+"("+strround((average_quantity))+" units"+")")
+            average_quantity_R += (", "+str(R)+"("+str(round((average_quantity)))+" units"+")")
             cost_R += (", "+str(R)+"("+str(cost)+" Rs"+")")
         total_cost_R += cost
 
@@ -1024,7 +1024,7 @@ for D in dvs:
     total_cost_D += cost
 
 
-clinic_breakpoints = [10,16,28,40,59]
+clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
 I_s = 1
 total_cost_I = 0
 no_of_times_I = ""
@@ -1083,85 +1083,42 @@ inventory_summary = {
 
 ########################### Shortages summary ##############################
 
-#For district 1
+
+clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
+
 I_s = 1
-num_clinics_1 = 10
-cost_1 = 0
-avg_cost_1 = 0
-
-for x in range(num_clinics_1):
-	I = I_s + x
-	for J in customers:
-		for T in time:
-			if(Sijt[T,J,I].x!=0):
-				cost_1 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_1 = cost_1/num_clinics_1
-
-#For district 2
-I_s = 11
-num_clinics_2 = 6
-cost_2 = 0
-avg_cost_2 = 0
-
-for x in range(num_clinics_2):
-	I = I_s + x
-	for J in customers:
-		for T in time:
-			if(Sijt[T,J,I].x!=0):
-				cost_2 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_2 = cost_2/num_clinics_2
-
-
-#For district 3
-I_s = 17
-num_clinics_3 = 12
-cost_3 = 0
-avg_cost_3 = 0
-
-for x in range(num_clinics_3):
-	I = I_s + x
-	for J in customers:
-		for T in time:
-			if(Sijt[T,J,I].x!=0):
-				cost_3 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_3 = cost_3/num_clinics_3
-
-
-#For district 4
-I_s = 29
-num_clinics_4 = 12
-cost_4 = 0
-avg_cost_4 = 0
-
-for x in range(num_clinics_4):
-	I = I_s + x
-	for J in customers:
-		for T in time:
-			if(Sijt[T,J,I].x!=0):
-				cost_4 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_4 = cost_4/num_clinics_4
-
-
-#For district 5
-I_s = 41
-num_clinics_5 = 19
-cost_5 = 0
-avg_cost_5 = 0
-
-for x in range(num_clinics_5):
-	I = I_s + x
-	for J in customers:
-		for T in time:
-			if(Sijt[T,J,I].x!=0):
-				cost_5 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_5 = cost_5/num_clinics_5
+num1 = 0
+costs_list = []
+average_costs_list = []
+number_of_clinics = []
+count = 0
+clinic_num = []
+for num in clinic_breakpoints:
+	cost = 0
+	avg_cost = 0
+	num_clinics = num - num1
+	count += 1
+	for x in range(num_clinics):
+		I = I_s + x
+		for J in customers:
+			for T in time:
+				if(Sijt[T,J,I].x!=0):
+					cost += Pjt[T-1][J-1]*Sijt[T,J,I].x
+	avg_cost = cost/num_clinics
+	I_s += num_clinics
+	num1 = num
+	costs_list.append(cost)
+	average_costs_list.append(avg_cost)
+	number_of_clinics.append(num_clinics)
+	clinic_num.append(count)
 
 shortage_summary = {
-    "District Number": ["1","2","3","4","5"],
-    "Number of clinics":[num_clinics_1,num_clinics_2,num_clinics_3,num_clinics_4,num_clinics_5],
-    "Total shortage cost Incurred":[cost_1,cost_2,cost_3,cost_4,cost_5],
-    "Average shortage cost incurred per clinic":[avg_cost_1,avg_cost_2,avg_cost_3,avg_cost_4,avg_cost_5]
+    "District Number": clinic_num,
+    "Number of clinics": number_of_clinics,
+    "Total shortage cost Incurred": costs_list,
+    "Average shortage cost incurred per clinic":average_costs_list
 }
+
 
 transport_df = pd.DataFrame.from_dict(transport_summary)
 inventory_df = pd.DataFrame.from_dict(inventory_summary)
@@ -1172,5 +1129,29 @@ transport_df.to_excel("transport.xlsx")
 inventory_df.to_excel("inventory.xlsx")
 ordering_df.to_excel("ordering.xlsx")
 shortage_df.to_excel("shortage.xlsx")
+
+###########################################Compiled Results##################################################
+writer = pd.ExcelWriter('compiled.xlsx',engine='xlsxwriter')   
+workbook=writer.book
+worksheet=workbook.add_worksheet('Compiled')
+writer.sheets['Compiled'] = worksheet
+worksheet.write(0,0,"Transport part")
+transport_df.to_excel(writer,sheet_name='Compiled',startrow=2 , startcol=0)
+
+x = 4 + len(transport_df.index)
+worksheet.write(x,0,"Inventory part")
+x += 2
+inventory_df.to_excel(writer,sheet_name='Compiled',startrow=x , startcol=0)
+
+x += 4 + len(inventory_df.index)
+worksheet.write(x,0,"Ordering part")
+x += 2
+ordering_df.to_excel(writer,sheet_name='Compiled',startrow=x , startcol=0)
+
+x += 4 + len(ordering_df.index)
+worksheet.write(x,0,"Shortage part")
+x += 2
+shortage_df.to_excel(writer,sheet_name='Compiled',startrow=x , startcol=0)
+workbook.close()
 
 ################################################# The End ######################################################### 
