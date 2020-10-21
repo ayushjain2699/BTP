@@ -13,7 +13,7 @@ worksheet.write(0,3,"demand")
 wb = xlrd.open_workbook("Vaccine Quantities(Bihar).xlsx") 
 sheet = wb.sheet_by_index(0)
 
-col = 9
+col = 8
 i = 606
 row = 1
 t = 12
