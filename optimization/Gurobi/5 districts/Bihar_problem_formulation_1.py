@@ -116,7 +116,7 @@ for index in df_demand.index:
 	if (df_demand['i'][index] > i):
 		break
 
-	dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = df_demand['demand'][index]*Fr_d
+	dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = round(df_demand['demand'][index]*Fr_d)
 
 #Capacity of cold chain points
 Bgt = [[round(fraction_storage*24545455) for G in range(g)] for T in range(t)]
@@ -1125,10 +1125,10 @@ inventory_df = pd.DataFrame.from_dict(inventory_summary)
 ordering_df = pd.DataFrame.from_dict(ordering_summary)
 shortage_df = pd.DataFrame.from_dict(shortage_summary)
 
-transport_df.to_excel("transport.xlsx")
-inventory_df.to_excel("inventory.xlsx")
-ordering_df.to_excel("ordering.xlsx")
-shortage_df.to_excel("shortage.xlsx")
+# transport_df.to_excel("transport.xlsx")
+# inventory_df.to_excel("inventory.xlsx")
+# ordering_df.to_excel("ordering.xlsx")
+# shortage_df.to_excel("shortage.xlsx")
 
 ###########################################Compiled Results##################################################
 writer = pd.ExcelWriter('compiled.xlsx',engine='xlsxwriter')   

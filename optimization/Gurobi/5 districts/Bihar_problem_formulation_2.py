@@ -7,7 +7,7 @@ from gurobipy import GRB
 
 ####################### INDEX ################################
 
-j = 1  #Customer sub index
+j = 3  #Customer sub index
 m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
@@ -15,6 +15,9 @@ r = 9  #Region sub index
 d = 5  #District sub index
 i = 59 #Clinic sub index
 t = 12  #Time sub index
+
+clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151,178,194,205,213,226,249,256,266,274,290,312,322,340,361,376,413,432,451,462,483,504,511,517,535,555,568,585,606]   #CLinic breakpoints for each districts
+clinic_breakpoints = clinic_breakpoints[0:d]
 
 customers = list(range(1,j+1))
 manufacturers = list(range(1,m+1))
@@ -33,11 +36,11 @@ fraction_transport = 1 #Fraction of total capacity in vehicles to be considered 
 #Transportation cost
 diesel_cost = 14
 booking_cost = {
-    "MG" : 40000,
-    "GS" : 20000,
-    "SR" : 12000,
-    "RD" : 10000,
-    "DI" : 5000
+	"MG" : 40000,
+	"GS" : 20000,
+	"SR" : 12000,
+	"RD" : 10000,
+	"DI" : 5000
 }
 np.random.seed(133)
 
@@ -49,23 +52,23 @@ Dsg = [[550]] #From G to S (confirm)
 df_Drs = pd.read_csv("Input_data/distances_sr.csv")
 Drs = [[0 for R in range(r)] for S in range(s)]
 for index in df_Drs.index:
-    Drs[df_Drs['s'][index]-1][df_Drs['r'][index]-1] = df_Drs['Distance'][index]
+	Drs[df_Drs['s'][index]-1][df_Drs['r'][index]-1] = df_Drs['Distance'][index]
 
 #From R to D
 df_Ddr = pd.read_csv("Input_data/distances_rd.csv")
 Ddr = [[0 for D in range(d)] for R in range(r)]
 for index in df_Ddr.index:
-    if (df_Ddr['d'][index] > d):
-        continue
-    Ddr[df_Ddr['r'][index]-1][df_Ddr['d'][index]-1] = df_Ddr['Distance'][index]
+	if (df_Ddr['d'][index] > d):
+		continue
+	Ddr[df_Ddr['r'][index]-1][df_Ddr['d'][index]-1] = df_Ddr['Distance'][index]
 
 #From D to I
 df_Did = pd.read_csv("Input_data/distances_di.csv")
 Did = [[0 for I in range(i)] for D in range(d)]
 for index in df_Did.index:
-    if (df_Did['d'][index] > d or df_Did['i'][index] > i):
-        continue
-    Did[df_Did['d'][index]-1][df_Did['i'][index]-1] = df_Did['Distance'][index]
+	if (df_Did['d'][index] > d or df_Did['i'][index] > i):
+		continue
+	Did[df_Did['d'][index]-1][df_Did['i'][index]-1] = df_Did['Distance'][index]
 
 #Capacity of trucks
 cap_veh_gm = round(fraction_transport*2932075) #Refrigerated van
@@ -107,13 +110,16 @@ Cidt = [[[15000 for I in range(i)] for D in range(d)] for T in range(t)]
 #Demand
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
-df_demand = pd.read_csv("Input_data/demand_weekly.csv")
+#Fraction of demand
+Fr_d = 0.5
+
+df_demand = pd.read_csv("Input_data/weekly_demand(children+old+hcw).csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
-    if (df_demand['i'][index] > i):
-        break
+	if (df_demand['i'][index] > i):
+		break
 
-    dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = df_demand['demand'][index]
+	dijt[df_demand['t'][index]-1][df_demand['j'][index]-1][df_demand['i'][index]-1] = round(df_demand['demand'][index]*Fr_d)
 
 #Capacity of cold chain points
 Bgt = [[round(fraction_storage*24545455) for G in range(g)] for T in range(t)]
@@ -122,23 +128,23 @@ Bst = [[round(fraction_storage*6818182) for S in range(s)] for T in range(t)]
 df_brt = pd.read_csv("Input_data/capacity_RVS.csv")
 Brt = [[0 for R in range(r)] for T in range(t)]
 for index in df_brt.index:
-    Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
+	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
 
 
 df_bdt = pd.read_csv("Input_data/capacity_DVS.csv")
 Bdt = [[0 for D in range(d)] for T in range(t)]
 for index in df_bdt.index:
-    if(df_bdt['d'][index] > d):
-        break
-    Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
+	if(df_bdt['d'][index] > d):
+		break
+	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
 
 
 df_bit = pd.read_csv("Input_data/capacity_clinics.csv")
 Bit = [[0 for I in range(i)] for T in range(t)]
 for index in df_bit.index:
-    if(df_bit['i'][index] > i):
-        break
-    Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
+	if(df_bit['i'][index] > i):
+		break
+	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
 
 
 
@@ -151,7 +157,16 @@ Bmt = [[1000000 for M in range(m)] for T in range(t)]
 No = 5
 
 #Number of medical personnel hours available (minutes)
-Nit = [[480 for I in range(i)] for T in range(t)]
+Nit = [[3360 for I in range(i)] for T in range(t)]
+
+#Hiring Cost of nurses
+hc = 25000
+
+#Firing Cost of nurses
+fc = 10000
+
+#Weekly wages of nurses
+wg = 6175
 
 ################### DECISION VARIABLES ##########################
 
@@ -187,6 +202,11 @@ Nrst = model.addVars(time,svs,rvs,vtype=GRB.INTEGER, name="Nrst")
 Ndrt = model.addVars(time,rvs,dvs,vtype=GRB.INTEGER, name="Ndrt")
 Nidt = model.addVars(time,dvs,clinics,vtype=GRB.INTEGER, name="Nidt")
 
+#Nurses
+N_nurses_it = model.addVars(time,clinics,vtype=GRB.INTEGER, name = "N_nurses_it")
+H_nurses_it = model.addVars(time,clinics,vtype=GRB.INTEGER, name = "H_nurses_it")
+F_nurses_it = model.addVars(time,clinics,vtype=GRB.INTEGER, name = "F_nurses_it")
+
 
 ############################# OBJECTIVE FUNCTION ###########################
 transport_part = gp.quicksum(Kgmt[T-1][M-1][G-1]*Ngmt[T,M,G] for G in gmsd for M in manufacturers for T in time)
@@ -211,7 +231,11 @@ ordering_part += gp.quicksum(Crst[T-1][S-1][R-1]*Xrst[T,S,R] for R in rvs for S 
 ordering_part += gp.quicksum(Cdrt[T-1][R-1][D-1]*Xdrt[T,R,D] for D in dvs for R in rvs for T in time)
 ordering_part += gp.quicksum(Cidt[T-1][D-1][I-1]*Xidt[T,D,I] for I in clinics for D in dvs for T in time)
 
-model.setObjective(transport_part+inventory_part+shortage_part+consumption_part+ordering_part,GRB.MINIMIZE)
+nurses_part = gp.quicksum(wg*N_nurses_it[T,I] for I in clinics for T in time)
+nurses_part += gp.quicksum(hc*H_nurses_it[T,I] for I in clinics for T in time)
+nurses_part += gp.quicksum(fc*F_nurses_it[T,I] for I in clinics for T in time)
+
+model.setObjective(transport_part+inventory_part+shortage_part+consumption_part+ordering_part+nurses_part,GRB.MINIMIZE)
 
 
 ###################################### CONSTRAINTS ################################
@@ -283,7 +307,10 @@ num_trucks_9 = model.addConstrs((Qidt[T,D,I]/cap_veh_id<=Nidt[T,D,I] for I in cl
 num_trucks_10 = model.addConstrs((Nidt[T,D,I]-Qidt[T,D,I]/cap_veh_id<=((cap_veh_id-1)/cap_veh_id) for I in clinics for D in dvs for T in time),name = "num_trucks_10")
 
 #Medical personnel availability constraints
-med_constraint = model.addConstrs((gp.quicksum(No*Wijt[T,J,I] for J in customers)<=Nit[T-1][I-1] for I in clinics for T in time),name = "med_constraint")
+med_constraint = model.addConstrs((gp.quicksum(No*Wijt[T,J,I] for J in customers)<=Nit[T-1][I-1]*N_nurses_it[T,I] for I in clinics for T in time),name = "med_constraint")
+
+#Nurses Balance Constraint
+nurses_constraint = model.addConstrs((N_nurses_it[T,I] == (N_nurses_it[T-1,I] if T>1 else 0)+ H_nurses_it[T,I] - F_nurses_it[T,I] for I in clinics for T in time),name = "nurses_constraint")
 
 #################################Solving the problem##########################
 model.optimize()
@@ -296,7 +323,7 @@ for v in model.getVars():
     sol.append(v.x)
 print("Done")
 
-###########################Code for full excel sheet results generation##########################
+# ###########################Code for full excel sheet results generation##########################
 workbook = xlsxwriter.Workbook('fraction-1.xlsx')
 worksheet = workbook.add_worksheet()
 merge_format = workbook.add_format({
@@ -857,7 +884,7 @@ for R in rvs:
             average_quantity_R += (str(R)+"("+str(round(average_quantity))+" units"+")")
             cost_R += (str(R)+"("+str(cost)+" Rs"+")")
         else:
-            average_quantity_R += (", "+str(R)+"("+strround((average_quantity))+" units"+")")
+            average_quantity_R += (", "+str(R)+"("+str(round((average_quantity)))+" units"+")")
             cost_R += (", "+str(R)+"("+str(cost)+" Rs"+")")
         total_cost_R += cost
 
@@ -935,7 +962,7 @@ for S in svs:
     for T in time:
         if(Ist[T,S].x>0):
             number += 1
-            total_inventory_G += Ist[T,S].x
+            total_inventory_S += Ist[T,S].x
             cost += hst[T-1][S-1]*Ist[T,S].x
     cost = round(cost)
     if(number!=0):
@@ -1018,7 +1045,6 @@ for D in dvs:
     total_cost_D += cost
 
 
-clinic_breakpoints = [10,16,28,40,59]
 I_s = 1
 total_cost_I = 0
 no_of_times_I = ""
@@ -1064,6 +1090,7 @@ for I_b in clinic_breakpoints:
         avg_inv_I += (", "+str(D)+"("+str(round(avg_inv_avg_district))+" units"+")") 
 
     D = D+1
+    I_s = I_b+1
 
 inventory_summary = {
     "CCP": ["G","S","R","D","I"],
@@ -1076,94 +1103,73 @@ inventory_summary = {
 
 ########################### Shortages summary ##############################
 
-#For district 1
+
 I_s = 1
-num_clinics_1 = 10
-cost_1 = 0
-avg_cost_1 = 0
-
-for x in range(num_clinics_1):
-    I = I_s + x
-    for J in customers:
-        for T in time:
-            if(Sijt[T,J,I].x!=0):
-                cost_1 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_1 = cost_1/num_clinics_1
-
-#For district 2
-I_s = 11
-num_clinics_2 = 6
-cost_2 = 0
-avg_cost_2 = 0
-
-for x in range(num_clinics_2):
-    I = I_s + x
-    for J in customers:
-        for T in time:
-            if(Sijt[T,J,I].x!=0):
-                cost_2 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_2 = cost_2/num_clinics_2
-
-
-#For district 3
-I_s = 17
-num_clinics_3 = 12
-cost_3 = 0
-avg_cost_3 = 0
-
-for x in range(num_clinics_3):
-    I = I_s + x
-    for J in customers:
-        for T in time:
-            if(Sijt[T,J,I].x!=0):
-                cost_3 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_3 = cost_3/num_clinics_3
-
-
-#For district 4
-I_s = 29
-num_clinics_4 = 12
-cost_4 = 0
-avg_cost_4 = 0
-
-for x in range(num_clinics_4):
-    I = I_s + x
-    for J in customers:
-        for T in time:
-            if(Sijt[T,J,I].x!=0):
-                cost_4 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_4 = cost_4/num_clinics_4
-
-
-#For district 5
-I_s = 41
-num_clinics_5 = 19
-cost_5 = 0
-avg_cost_5 = 0
-
-for x in range(num_clinics_5):
-    I = I_s + x
-    for J in customers:
-        for T in time:
-            if(Sijt[T,J,I].x!=0):
-                cost_5 += Pjt[T-1][J-1]*Sijt[T,J,I].x
-avg_cost_5 = cost_5/num_clinics_5
+num1 = 0
+costs_list = []
+average_costs_list = []
+number_of_clinics = []
+count = 0
+clinic_num = []
+for num in clinic_breakpoints:
+	cost = 0
+	avg_cost = 0
+	num_clinics = num - num1
+	count += 1
+	for x in range(num_clinics):
+		I = I_s + x
+		for J in customers:
+			for T in time:
+				if(Sijt[T,J,I].x!=0):
+					cost += Pjt[T-1][J-1]*Sijt[T,J,I].x
+	avg_cost = cost/num_clinics
+	I_s += num_clinics
+	num1 = num
+	costs_list.append(cost)
+	average_costs_list.append(avg_cost)
+	number_of_clinics.append(num_clinics)
+	clinic_num.append(count)
 
 shortage_summary = {
-    "District Number": ["1","2","3","4","5"],
-    "Number of clinics":[num_clinics_1,num_clinics_2,num_clinics_3,num_clinics_4,num_clinics_5],
-    "Total shortage cost Incurred":[cost_1,cost_2,cost_3,cost_4,cost_5],
-    "Average shortage cost incurred per clinic":[avg_cost_1,avg_cost_2,avg_cost_3,avg_cost_4,avg_cost_5]
+    "District Number": clinic_num,
+    "Number of clinics": number_of_clinics,
+    "Total shortage cost Incurred": costs_list,
+    "Average shortage cost incurred per clinic":average_costs_list
 }
+
 
 transport_df = pd.DataFrame.from_dict(transport_summary)
 inventory_df = pd.DataFrame.from_dict(inventory_summary)
 ordering_df = pd.DataFrame.from_dict(ordering_summary)
 shortage_df = pd.DataFrame.from_dict(shortage_summary)
 
-transport_df.to_excel("transport.xlsx")
-inventory_df.to_excel("inventory.xlsx")
-ordering_df.to_excel("ordering.xlsx")
-shortage_df.to_excel("shortage.xlsx")
+# transport_df.to_excel("transport.xlsx")
+# inventory_df.to_excel("inventory.xlsx")
+# ordering_df.to_excel("ordering.xlsx")
+# shortage_df.to_excel("shortage.xlsx")
+
+###########################################Compiled Results##################################################
+writer = pd.ExcelWriter('compiled.xlsx',engine='xlsxwriter')   
+workbook=writer.book
+worksheet=workbook.add_worksheet('Compiled')
+writer.sheets['Compiled'] = worksheet
+worksheet.write(0,0,"Transport part")
+transport_df.to_excel(writer,sheet_name='Compiled',startrow=2 , startcol=0)
+
+x = 4 + len(transport_df.index)
+worksheet.write(x,0,"Inventory part")
+x += 2
+inventory_df.to_excel(writer,sheet_name='Compiled',startrow=x , startcol=0)
+
+x += 4 + len(inventory_df.index)
+worksheet.write(x,0,"Ordering part")
+x += 2
+ordering_df.to_excel(writer,sheet_name='Compiled',startrow=x , startcol=0)
+
+x += 4 + len(ordering_df.index)
+worksheet.write(x,0,"Shortage part")
+x += 2
+shortage_df.to_excel(writer,sheet_name='Compiled',startrow=x , startcol=0)
+workbook.close()
 
 ################################################# The End ######################################################### 

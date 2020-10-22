@@ -13,20 +13,22 @@ worksheet.write(0,3,"demand")
 wb = xlrd.open_workbook("Vaccine Quantities(Bihar).xlsx") 
 sheet = wb.sheet_by_index(0)
 
-col = 8
 i = 606
+j = 2
 row = 1
 t = 12
 demand = 0
 
 for I in range(1,i+1):
-	demand = sheet.cell_value(I,col)/12
-	for T in range(1,t+1):
-		worksheet.write(row,0,I)
-		worksheet.write(row,1,1)
-		worksheet.write(row,2,T)
-		worksheet.write(row,3,math.ceil(demand))
-		row += 1
+	for J in range(1,j+1):
+		col = 5+J
+		demand = sheet.cell_value(I,col)/12
+		for T in range(1,t+1):
+			worksheet.write(row,0,I)
+			worksheet.write(row,1,J)
+			worksheet.write(row,2,T)
+			worksheet.write(row,3,math.ceil(demand))
+			row += 1
 workbook.close()
 
 read_file = pd.read_excel ("weekly_demand.xls") 
