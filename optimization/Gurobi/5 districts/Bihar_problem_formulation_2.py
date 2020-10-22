@@ -87,11 +87,15 @@ Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)]
 
 
 #Shortage costs
-Pjt = [[1000000 for J in range(j)] for T in range(t)]
-# for T in range(t):
-#     Pjt[T][0] = 750000
-#     Pjt[T][1] = 650000
+Pjt = [[0 for J in range(j)] for T in range(t)]
+for T in range(t):
+    Pjt[T][0] = 750000
+    Pjt[T][1] = 650000
+    Pjt[T][2] = 550000
 #Pjt_obj = np.array([[[Pjt[T][J] for I in range(i)] for J in range(j)] for T in range(t)])
+
+#Clinical cost per unit of vaccine
+Vj = 225
 
 #Inventory holding costs
 hgt = [[0.3 for G in range(g)] for T in range(t)]
@@ -223,7 +227,7 @@ inventory_part += gp.quicksum(hit[T-1][I-1]*Iit[T,I] for I in clinics for T in t
 
 shortage_part = gp.quicksum(Pjt[T-1][J-1]*Sijt[T,J,I] for J in customers for I in clinics for T in time)
 
-consumption_part = gp.quicksum(0*Wijt[T,J,I] for J in customers for I in clinics for T in time) #Do we even need this?
+consumption_part = gp.quicksum(Vj*Wijt[T,J,I] for J in customers for I in clinics for T in time) #Do we even need this?
 
 ordering_part = gp.quicksum(Cgmt[T-1][M-1][G-1]*Xgmt[T,M,G] for G in gmsd for M in manufacturers for T in time)
 ordering_part += gp.quicksum(Csgt[T-1][G-1][S-1]*Xsgt[T,G,S] for S in svs for G in gmsd for T in time)

@@ -7,7 +7,7 @@ from gurobipy import GRB
 
 ####################### INDEX ################################
 
-j = 1  #Customer sub index
+j = 3  #Customer sub index
 m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
@@ -15,6 +15,9 @@ r = 9  #Region sub index
 d = 5  #District sub index
 i = 59 #Clinic sub index
 t = 12  #Time sub index
+
+clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151,178,194,205,213,226,249,256,266,274,290,312,322,340,361,376,413,432,451,462,483,504,511,517,535,555,568,585,606]   #CLinic breakpoints for each districts
+clinic_breakpoints = clinic_breakpoints[0:d]
 
 customers = list(range(1,j+1))
 manufacturers = list(range(1,m+1))
@@ -84,11 +87,11 @@ Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)]
 
 
 #Shortage costs
-Pjt = [[1000000 for J in range(j)] for T in range(t)]
-# for T in range(t):
-#     Pjt[T][0] = 750000
-#     Pjt[T][1] = 650000
-#Pjt_obj = np.array([[[Pjt[T][J] for I in range(i)] for J in range(j)] for T in range(t)])
+Pjt = [[0 for J in range(j)] for T in range(t)]
+for T in range(t):
+    Pjt[T][0] = 750000
+    Pjt[T][1] = 650000
+    Pjt[T][2] = 550000
 
 #Inventory holding costs
 hgt = [[0.3 for G in range(g)] for T in range(t)]
@@ -110,7 +113,7 @@ wastage_factor = 0.5 #This value will depend on the vaccine, we are talking abou
 #Fraction of demand
 Fr_d = 0.5
 
-df_demand = pd.read_csv("Input_data/weekly_demand.csv")
+df_demand = pd.read_csv("Input_data/weekly_demand(children+old+hcw).csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
 for index in df_demand.index:
 	if (df_demand['i'][index] > i):
@@ -209,7 +212,7 @@ inventory_part += gp.quicksum(hit[T-1][I-1]*Iit[T,I] for I in clinics for T in t
 
 shortage_part = gp.quicksum(Pjt[T-1][J-1]*Sijt[T,J,I] for J in customers for I in clinics for T in time)
 
-consumption_part = gp.quicksum(0*Wijt[T,J,I] for J in customers for I in clinics for T in time) #Do we even need this?
+consumption_part = gp.quicksum(Vj*Wijt[T,J,I] for J in customers for I in clinics for T in time) #Do we even need this?
 
 ordering_part = gp.quicksum(Cgmt[T-1][M-1][G-1]*Xgmt[T,M,G] for G in gmsd for M in manufacturers for T in time)
 ordering_part += gp.quicksum(Csgt[T-1][G-1][S-1]*Xsgt[T,G,S] for S in svs for G in gmsd for T in time)
@@ -1024,7 +1027,7 @@ for D in dvs:
     total_cost_D += cost
 
 
-clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
+#clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
 I_s = 1
 total_cost_I = 0
 no_of_times_I = ""
@@ -1084,7 +1087,7 @@ inventory_summary = {
 ########################### Shortages summary ##############################
 
 
-clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
+#clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
 
 I_s = 1
 num1 = 0
