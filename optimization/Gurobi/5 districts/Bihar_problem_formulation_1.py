@@ -150,6 +150,9 @@ for index in df_bit.index:
 
 model = gp.Model('Vaccine_Distribution')
 
+#Clinical cost per unit of vaccine
+Vj = 225
+
 #Production Capacity
 Bmt = [[1000000 for M in range(m)] for T in range(t)]
 
