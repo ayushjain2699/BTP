@@ -86,7 +86,7 @@ Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost["RD"] for D in range(0,d)]
 Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
 
 
-#Shortage costs
+#Shortage costs;
 Pjt = [[0 for J in range(j)] for T in range(t)]
 for T in range(t):
     Pjt[T][0] = 75000       #children
