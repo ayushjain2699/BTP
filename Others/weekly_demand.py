@@ -14,7 +14,7 @@ wb = xlrd.open_workbook("Vaccine Quantities(Bihar).xlsx")
 sheet = wb.sheet_by_index(0)
 
 i = 606
-j = 2
+j = 3
 row = 1
 t = 12
 demand = 0
