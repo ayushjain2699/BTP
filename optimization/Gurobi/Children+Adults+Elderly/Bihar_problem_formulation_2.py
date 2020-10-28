@@ -115,7 +115,7 @@ Cidt = [[[15000 for I in range(i)] for D in range(d)] for T in range(t)]
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
 #Fraction of demand
-Fr_d = 0.25
+Fr_d = 1
 #Fr_d = 0.5
 #Fr_d = 0.75
 
