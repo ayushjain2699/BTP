@@ -13,7 +13,7 @@ g = 1  #GMSD index
 s = 1  #State sub index
 r = 9  #Region sub index
 d = 10  #District sub index
-i = 59 #Clinic sub index
+i = 151 #Clinic sub index
 t = 12  #Time sub index
 
 clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151,178,194,205,213,226,249,256,266,274,290,312,322,340,361,376,413,432,451,462,483,504,511,517,535,555,568,585,606]   #CLinic breakpoints for each districts

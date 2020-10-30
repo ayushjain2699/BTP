@@ -13,7 +13,7 @@ g = 1  #GMSD index
 s = 1  #State sub index
 r = 9  #Region sub index
 d = 10  #District sub index
-i = 59 #Clinic sub index
+i = 151 #Clinic sub index
 t = 12  #Time sub index
 
 clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151,178,194,205,213,226,249,256,266,274,290,312,322,340,361,376,413,432,451,462,483,504,511,517,535,555,568,585,606]   #CLinic breakpoints for each districts
@@ -30,8 +30,8 @@ time = list(range(1,t+1))
 
 ########################### PARAMETERS ################################
 l = GRB.INFINITY #large number for consistency constraints
-fraction_storage = 1 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
-fraction_transport = 1 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
+fraction_storage = 0.25 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
+fraction_transport = 0.25 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
 
 #Transportation cost
 diesel_cost = 14
@@ -134,7 +134,7 @@ Bst = [[round(fraction_storage*6818182) for S in range(s)] for T in range(t)]
 df_brt = pd.read_csv("Input_data/capacity_RVS.csv")
 Brt = [[0 for R in range(r)] for T in range(t)]
 for index in df_brt.index:
-	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
+	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = round(fraction_storage*df_brt['Capacity'][index])
 
 
 df_bdt = pd.read_csv("Input_data/capacity_DVS.csv")
@@ -142,7 +142,7 @@ Bdt = [[0 for D in range(d)] for T in range(t)]
 for index in df_bdt.index:
 	if(df_bdt['d'][index] > d):
 		break
-	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
+	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = round(fraction_storage*df_bdt['Capacity'][index])
 
 
 df_bit = pd.read_csv("Input_data/capacity_clinics.csv")
@@ -150,7 +150,7 @@ Bit = [[0 for I in range(i)] for T in range(t)]
 for index in df_bit.index:
 	if(df_bit['i'][index] > i):
 		break
-	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
+	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = round(fraction_storage*df_bit['Capacity'][index])
 
 
 
