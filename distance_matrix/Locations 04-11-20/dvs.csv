@@ -1,0 +1,39 @@
+type,latitude,longitude,name,desc,precision,source
+W,26.133199700,87.458198500,"Araria , Bihar, India","Basantpur, India",city/town,Bing Maps
+W,25.243740100,84.663002000,"Arwal , Bihar, India","Arwal, India",city/town,Bing Maps
+W,24.753004100,84.373313900,"Aurangabad , Bihar, India","Aurangabad, India",city/town,Bing Maps
+W,24.885000200,86.924301100,"Banka , Bihar, India","Banka, India",city/town,Bing Maps
+W,25.424041700,86.134681700,"Begusarai , Bihar, India","Begusarai, India",city/town,Bing Maps
+W,25.241323500,86.990119900,"Bhagalpur , Bihar, India","Bhagalpur, India",city/town,Bing Maps
+W,25.542944000,84.661735500,"Bhojpur , Bihar, India","Bhojpur, India",Neighborhood,Bing Maps
+W,25.561002700,83.980697600,"Buxar , Bihar, India","Buxar, India",city/town,Bing Maps
+W,26.148771300,85.903305100,"Darbhanga , Bihar, India","Darbhanga, India",city/town,Bing Maps
+W,26.625690500,84.898551900,"East Champaran , Bihar, India","East Champaran, India",Neighborhood,Bing Maps
+W,24.821636200,85.035392800,"Gaya , Bihar, India","Gaya, India",city/town,Bing Maps
+W,26.464222000,84.452003500,"Gopalganj , Bihar, India","Gopalganj, India",city/town,Bing Maps
+W,24.929399500,86.227401700,"Jamui , Bihar, India","Jamui, India",city/town,Bing Maps
+W,25.224296600,84.990203900,"Jehanabad , Bihar, India","Jehanabad, India",city/town,Bing Maps
+W,25.040590300,83.612411500,"Kaimur , Bihar, India","Kaimur district, India",city/town,Bing Maps
+W,25.547905000,87.563880900,"Katihar , Bihar, India","Katihar, India",city/town,Bing Maps
+W,25.505699200,86.467201200,"Khagaria , Bihar, India","Khagaria, India",city/town,Bing Maps
+W,26.097801200,87.948600800,"Kishanganj , Bihar, India","Kishanganj, India",city/town,Bing Maps
+W,25.167779900,86.094436600,"Lakhisarai , Bihar, India","Lakhisarai, India",city/town,Bing Maps
+W,25.919300100,86.790298500,"Madhepura , Bihar, India","Madhepura, India",city/town,Bing Maps
+W,26.348899800,86.077102700,"Madhubani , Bihar, India","Madhubani, India",city/town,Bing Maps
+W,25.386766400,86.465881300,"Munger , Bihar, India","Munger, India",city/town,Bing Maps
+W,26.140886300,85.357490500,"Muzaffarpur , Bihar, India","Muzaffarpur, India",city/town,Bing Maps
+W,25.128290200,85.450225800,"Nalanda , Bihar, India","Nalanda, India",city/town,Bing Maps
+W,24.877092400,85.537490800,"Nawada , Bihar, India","Nawada, India",city/town,Bing Maps
+W,25.553194000,85.074745200,"Patna , Bihar, India","Patna, India",city/town,Bing Maps
+W,25.727945300,87.515167200,"Purnia , Bihar, India","Purnia, India",city/town,Bing Maps
+W,24.624416400,83.917900100,"Rohtas , Bihar, India","Rohtas, India",city/town,Bing Maps
+W,25.852983500,86.562789900,"Saharsa , Bihar, India","Saharsa, India",city/town,Bing Maps
+W,25.859800300,85.786598200,"Samastipur , Bihar, India","Samastipur, India",city/town,Bing Maps
+W,26.054342300,84.616905200,"Saran , Bihar, India","Saran, India",Neighborhood,Bing Maps
+W,25.133895900,85.855400100,"Sheikhpura , Bihar, India","Sheikhpura, India",city/town,Bing Maps
+W,26.514099100,85.295700100,"Sheohar , Bihar, India","Sheohar, India",city/town,Bing Maps
+W,26.561899200,85.522598300,"Sitamarhi , Bihar, India","Sitamarhi, India",city/town,Bing Maps
+W,26.160295500,84.414749100,"Siwan , Bihar, India","Siwan, India",city/town,Bing Maps
+W,26.113100100,86.593101500,"Supaul , Bihar, India","Supaul, India",city/town,Bing Maps
+W,25.937816600,85.145896900,"Vaishali , Bihar, India","Vaishali, India",city/town,Bing Maps
+W,27.080034300,84.340293900,"West Champaran , Bihar, India",Pashchim Champaran,county/district,Bing Maps

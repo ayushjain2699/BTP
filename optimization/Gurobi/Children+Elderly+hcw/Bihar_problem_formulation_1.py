@@ -12,13 +12,12 @@ m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
 r = 9  #Region sub index
-d = 10  #District sub index
+d = 5  #District sub index
 i = 151 #Clinic sub index
 t = 12  #Time sub index
 
 clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151,178,194,205,213,226,249,256,266,274,290,312,322,340,361,376,413,432,451,462,483,504,511,517,535,555,568,585,606]   #CLinic breakpoints for each districts
 clinic_breakpoints = clinic_breakpoints[0:d]
-i = clinic_breakpoints[d-1]
 
 customers = list(range(1,j+1))
 manufacturers = list(range(1,m+1))
@@ -28,6 +27,7 @@ rvs = list(range(1,r+1))
 dvs = list(range(1,d+1))
 clinics = list(range(1,i+1))
 time = list(range(1,t+1))
+
 ########################### PARAMETERS ################################
 l = GRB.INFINITY #large number for consistency constraints
 fraction_storage = 0.25 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
@@ -86,16 +86,12 @@ Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost["RD"] for D in range(0,d)]
 Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
 
 
-#Shortage costs;
+#Shortage costs
 Pjt = [[0 for J in range(j)] for T in range(t)]
 for T in range(t):
-    Pjt[T][0] = 75000      #children
-    Pjt[T][1] = 50000      #Old
-    Pjt[T][2] = 50000      #hcw
-
-
-#Clinical cost per unit of vaccine
-Vj = 225
+    Pjt[T][0] = 750000
+    Pjt[T][1] = 650000
+    Pjt[T][2] = 550000
 
 #Inventory holding costs
 hgt = [[0.3 for G in range(g)] for T in range(t)]
@@ -115,9 +111,7 @@ Cidt = [[[15000 for I in range(i)] for D in range(d)] for T in range(t)]
 wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
 
 #Fraction of demand
-Fr_d = 1
-#Fr_d = 0.5
-#Fr_d = 0.75
+Fr_d = 1.0
 
 df_demand = pd.read_csv("Input_data/weekly_demand.csv")
 dijt = [[[0 for I in range(1,i+1)] for J in range(j)] for T in range(1,t+1)]
@@ -156,8 +150,11 @@ for index in df_bit.index:
 
 model = gp.Model('Vaccine_Distribution')
 
+#Clinical cost per unit of vaccine
+Vj = 225
+
 #Production Capacity
-Bmt = [[3000000 for M in range(m)] for T in range(t)]
+Bmt = [[1000000 for M in range(m)] for T in range(t)]
 
 #Average time required to administer the vaccine (minutes)
 No = 5
@@ -165,14 +162,8 @@ No = 5
 #Number of medical personnel hours available (minutes)
 Nit = [[3360 for I in range(i)] for T in range(t)]
 
-#Hiring Cost of nurses
-hc = 25000
-
-#Firing Cost of nurses
-fc = 10000
-
-#Weekly wages of nurses
-wg = 6175
+#Number of nurses
+N_nurses = 25
 
 ################### DECISION VARIABLES ##########################
 
@@ -208,11 +199,6 @@ Nrst = model.addVars(time,svs,rvs,vtype=GRB.INTEGER, name="Nrst")
 Ndrt = model.addVars(time,rvs,dvs,vtype=GRB.INTEGER, name="Ndrt")
 Nidt = model.addVars(time,dvs,clinics,vtype=GRB.INTEGER, name="Nidt")
 
-#Nurses
-N_nurses_it = model.addVars(time,clinics,vtype=GRB.INTEGER, name = "N_nurses_it")
-H_nurses_it = model.addVars(time,clinics,vtype=GRB.INTEGER, name = "H_nurses_it")
-F_nurses_it = model.addVars(time,clinics,vtype=GRB.INTEGER, name = "F_nurses_it")
-
 
 ############################# OBJECTIVE FUNCTION ###########################
 transport_part = gp.quicksum(Kgmt[T-1][M-1][G-1]*Ngmt[T,M,G] for G in gmsd for M in manufacturers for T in time)
@@ -237,11 +223,7 @@ ordering_part += gp.quicksum(Crst[T-1][S-1][R-1]*Xrst[T,S,R] for R in rvs for S 
 ordering_part += gp.quicksum(Cdrt[T-1][R-1][D-1]*Xdrt[T,R,D] for D in dvs for R in rvs for T in time)
 ordering_part += gp.quicksum(Cidt[T-1][D-1][I-1]*Xidt[T,D,I] for I in clinics for D in dvs for T in time)
 
-nurses_part = gp.quicksum(wg*N_nurses_it[T,I] for I in clinics for T in time)
-nurses_part += gp.quicksum(hc*H_nurses_it[T,I] for I in clinics for T in time)
-nurses_part += gp.quicksum(fc*F_nurses_it[T,I] for I in clinics for T in time)
-
-model.setObjective(transport_part+inventory_part+shortage_part+consumption_part+ordering_part+nurses_part,GRB.MINIMIZE)
+model.setObjective(transport_part+inventory_part+shortage_part+consumption_part+ordering_part,GRB.MINIMIZE)
 
 
 ###################################### CONSTRAINTS ################################
@@ -313,10 +295,7 @@ num_trucks_9 = model.addConstrs((Qidt[T,D,I]/cap_veh_id<=Nidt[T,D,I] for I in cl
 num_trucks_10 = model.addConstrs((Nidt[T,D,I]-Qidt[T,D,I]/cap_veh_id<=((cap_veh_id-1)/cap_veh_id) for I in clinics for D in dvs for T in time),name = "num_trucks_10")
 
 #Medical personnel availability constraints
-med_constraint = model.addConstrs((gp.quicksum(No*Wijt[T,J,I] for J in customers)<=Nit[T-1][I-1]*N_nurses_it[T,I] for I in clinics for T in time),name = "med_constraint")
-
-#Nurses Balance Constraint
-nurses_constraint = model.addConstrs((N_nurses_it[T,I] == (N_nurses_it[T-1,I] if T>1 else 0)+ H_nurses_it[T,I] - F_nurses_it[T,I] for I in clinics for T in time),name = "nurses_constraint")
+med_constraint = model.addConstrs((gp.quicksum(No*Wijt[T,J,I] for J in customers)<=Nit[T-1][I-1]*N_nurses for I in clinics for T in time),name = "med_constraint")
 
 #################################Solving the problem##########################
 model.optimize()
@@ -329,8 +308,8 @@ for v in model.getVars():
     sol.append(v.x)
 print("Done")
 
-# ###########################Code for full excel sheet results generation##########################
-workbook = xlsxwriter.Workbook('fraction-0.25.xlsx')
+###########################Code for full excel sheet results generation##########################
+workbook = xlsxwriter.Workbook('fraction-1.xlsx')
 worksheet = workbook.add_worksheet()
 merge_format = workbook.add_format({
     'bold': 1,
@@ -1051,6 +1030,7 @@ for D in dvs:
     total_cost_D += cost
 
 
+#clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
 I_s = 1
 total_cost_I = 0
 no_of_times_I = ""
@@ -1109,6 +1089,8 @@ inventory_summary = {
 
 ########################### Shortages summary ##############################
 
+
+#clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151]
 
 I_s = 1
 num1 = 0
@@ -1178,4 +1160,4 @@ x += 2
 shortage_df.to_excel(writer,sheet_name='Compiled',startrow=x , startcol=0)
 workbook.close()
 
-################################################# The End ######################################################### 
+################################################# The End #########################################################
