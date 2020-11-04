@@ -7,7 +7,7 @@ from gurobipy import GRB
 
 ####################### INDEX ################################
 
-j = 2  #Customer sub index
+j = 3  #Customer sub index
 m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
@@ -28,7 +28,6 @@ rvs = list(range(1,r+1))
 dvs = list(range(1,d+1))
 clinics = list(range(1,i+1))
 time = list(range(1,t+1))
-
 ########################### PARAMETERS ################################
 l = GRB.INFINITY #large number for consistency constraints
 fraction_storage = 0.25 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
@@ -43,6 +42,7 @@ booking_cost = {
 	"RD" : 10000,
 	"DI" : 5000
 }
+np.random.seed(133)
 
 #Distances
 Dgm = [[1000]] #From M to G (confirm)
@@ -86,12 +86,12 @@ Kdrt = np.array([[[Ddr[R][D]*diesel_cost+booking_cost["RD"] for D in range(0,d)]
 Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)] for D in range(0,d)] for T in range(0,t)])
 
 
-#Shortage costs
+#Shortage costs;
 Pjt = [[0 for J in range(j)] for T in range(t)]
 for T in range(t):
-    Pjt[T][0] = 75000       #children
-    Pjt[T][1] = 50000       #elderly
-    Pjt[T][2] = 50000       #hcw
+    Pjt[T][0] = 75000      #children
+    Pjt[T][1] = 50000      #Old
+    Pjt[T][2] = 50000      #hcw
 
 
 #Clinical cost per unit of vaccine
@@ -157,7 +157,7 @@ for index in df_bit.index:
 model = gp.Model('Vaccine_Distribution')
 
 #Production Capacity
-Bmt = [[1500000 for M in range(m)] for T in range(t)]
+Bmt = [[350000 for M in range(m)] for T in range(t)]
 
 #Average time required to administer the vaccine (minutes)
 No = 5
@@ -1149,8 +1149,13 @@ inventory_df = pd.DataFrame.from_dict(inventory_summary)
 ordering_df = pd.DataFrame.from_dict(ordering_summary)
 shortage_df = pd.DataFrame.from_dict(shortage_summary)
 
+# transport_df.to_excel("transport.xlsx")
+# inventory_df.to_excel("inventory.xlsx")
+# ordering_df.to_excel("ordering.xlsx")
+# shortage_df.to_excel("shortage.xlsx")
+
 ###########################################Compiled Results##################################################
-writer = pd.ExcelWriter('compiled-0.25.xlsx',engine='xlsxwriter')   
+writer = pd.ExcelWriter('compiled.xlsx',engine='xlsxwriter')   
 workbook=writer.book
 worksheet=workbook.add_worksheet('Compiled')
 writer.sheets['Compiled'] = worksheet

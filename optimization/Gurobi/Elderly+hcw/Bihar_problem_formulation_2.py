@@ -157,7 +157,7 @@ for index in df_bit.index:
 model = gp.Model('Vaccine_Distribution')
 
 #Production Capacity
-Bmt = [[1500000 for M in range(m)] for T in range(t)]
+Bmt = [[350000 for M in range(m)] for T in range(t)]
 
 #Average time required to administer the vaccine (minutes)
 No = 5

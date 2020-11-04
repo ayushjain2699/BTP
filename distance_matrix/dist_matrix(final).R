@@ -19,18 +19,19 @@ if(nrow(data)>1){
 index_names_origin = data$name
 
 
-for (i in 8:14)
+for (i in 1:21)
 {
-        print(40*i+1)
-        data = read.csv("phc_.csv")   ####
-        data = data[601:nrow(data),]
+        print(30*i+1)
+        data = read.csv("phc.csv")   ####
+        e = min(606,30*i)
+        data = data[(30*(i-1)+1):e,]
         data$latitude = as.character(data$latitude)
         data$longitude = as.character(data$longitude)
         data$cor = paste(data$latitude,data$longitude,sep = ",")
         dest = data$cor[1]
         if(nrow(data)>1){
-                for(i in 2:nrow(data)){
-                        dest = paste(dest,data[i,8],sep=";")
+                for(j in 2:nrow(data)){
+                        dest = paste(dest,data[j,8],sep=";")
                 }
         }
         index_names_dest = data$name
@@ -50,8 +51,15 @@ for (i in 8:14)
         
         colnames(data) = c("DVS/PHC",index_names_dest) ###
         data$`DVS/PHC` = index_names_origin    ###
-        #write.csv(data,file = ".\\DVS-Clinics.csv",row.names = F)   ###
-        final = read.csv("DVS-PHC.csv")
-        final = cbind(final,data[,-1])
-        write.csv(final,file = ".\\DVS-PHC.csv",row.names = F) 
-}
+        if(i==1)
+        {
+                write.csv(data,file = ".\\DVS-PHC.csv",row.names = F)
+        }
+        if(i>1)
+        {
+                final = read.csv(".\\DVS-PHC.csv")
+                final = cbind(final,data[,-1])
+                write.csv(final,file = ".\\DVS-PHC.csv",row.names = F) 
+        }
+        #write.csv(data,file = ".\\RVS-DVS.csv",row.names = F)   ###
+}  

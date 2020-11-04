@@ -154,7 +154,7 @@ model = gp.Model('Vaccine_Distribution')
 Vj = 225
 
 #Production Capacity
-Bmt = [[1000000 for M in range(m)] for T in range(t)]
+Bmt = [[350000 for M in range(m)] for T in range(t)]
 
 #Average time required to administer the vaccine (minutes)
 No = 5

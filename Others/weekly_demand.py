@@ -20,8 +20,8 @@ t = 12
 demand = 0
 
 for I in range(1,i+1):
-	for J in range(1,j+1):
-		col = 5+J
+	for J in [8,9]:
+		col = J
 		demand = sheet.cell_value(I,col)/52
 		for T in range(1,t+1):
 			worksheet.write(row,0,I)
