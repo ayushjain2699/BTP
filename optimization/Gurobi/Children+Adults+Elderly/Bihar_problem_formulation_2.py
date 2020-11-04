@@ -7,7 +7,7 @@ from gurobipy import GRB
 
 ####################### INDEX ################################
 
-j = 2  #Customer sub index
+j = 3  #Customer sub index
 m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
