@@ -18,6 +18,7 @@ t = 12  #Time sub index
 
 clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151,178,194,205,213,226,249,256,266,274,290,312,322,340,361,376,413,432,451,462,483,504,511,517,535,555,568,585,606]   #CLinic breakpoints for each districts
 clinic_breakpoints = clinic_breakpoints[0:d]
+i = clinic_breakpoints[d-1]
 
 customers = list(range(1,j+1))
 manufacturers = list(range(1,m+1))
@@ -30,8 +31,8 @@ time = list(range(1,t+1))
 
 ########################### PARAMETERS ################################
 l = GRB.INFINITY #large number for consistency constraints
-fraction_storage = 1 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
-fraction_transport = 1 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
+fraction_storage = 0.25 #Fraction of total capacity in cold chain points to be considered for COVID-19 vaccine
+fraction_transport = 0.25 #Fraction of total capacity in vehicles to be considered for COVID-19 vaccine
 
 #Transportation cost
 diesel_cost = 14
@@ -89,7 +90,7 @@ Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)]
 #Shortage costs
 Pjt = [[0 for J in range(j)] for T in range(t)]
 for T in range(t):
-    Pjt[T][0] = 12150       #old
+    Pjt[T][0] = 50000       #elderly
     Pjt[T][1] = 50000       #hcw
 
 
@@ -156,7 +157,7 @@ for index in df_bit.index:
 model = gp.Model('Vaccine_Distribution')
 
 #Production Capacity
-Bmt = [[1000000 for M in range(m)] for T in range(t)]
+Bmt = [[1500000 for M in range(m)] for T in range(t)]
 
 #Average time required to administer the vaccine (minutes)
 No = 5
@@ -329,7 +330,7 @@ for v in model.getVars():
 print("Done")
 
 # ###########################Code for full excel sheet results generation##########################
-workbook = xlsxwriter.Workbook('fraction-1.xlsx')
+workbook = xlsxwriter.Workbook('fraction-0.25.xlsx')
 worksheet = workbook.add_worksheet()
 merge_format = workbook.add_format({
     'bold': 1,
@@ -1148,13 +1149,8 @@ inventory_df = pd.DataFrame.from_dict(inventory_summary)
 ordering_df = pd.DataFrame.from_dict(ordering_summary)
 shortage_df = pd.DataFrame.from_dict(shortage_summary)
 
-# transport_df.to_excel("transport.xlsx")
-# inventory_df.to_excel("inventory.xlsx")
-# ordering_df.to_excel("ordering.xlsx")
-# shortage_df.to_excel("shortage.xlsx")
-
 ###########################################Compiled Results##################################################
-writer = pd.ExcelWriter('compiled.xlsx',engine='xlsxwriter')   
+writer = pd.ExcelWriter('compiled-0.25.xlsx',engine='xlsxwriter')   
 workbook=writer.book
 worksheet=workbook.add_worksheet('Compiled')
 writer.sheets['Compiled'] = worksheet

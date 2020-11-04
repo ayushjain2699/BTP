@@ -7,7 +7,7 @@ from gurobipy import GRB
 
 ####################### INDEX ################################
 
-j = 3  #Customer sub index
+j = 2  #Customer sub index
 m = 1  #Manufacturer sub index
 g = 1  #GMSD index
 s = 1  #State sub index
@@ -18,6 +18,7 @@ t = 12  #Time sub index
 
 clinic_breakpoints = [10,16,28,40,59,76,92,103,123,151,178,194,205,213,226,249,256,266,274,290,312,322,340,361,376,413,432,451,462,483,504,511,517,535,555,568,585,606]   #CLinic breakpoints for each districts
 clinic_breakpoints = clinic_breakpoints[0:d]
+i = clinic_breakpoints[d-1]
 
 customers = list(range(1,j+1))
 manufacturers = list(range(1,m+1))
@@ -42,7 +43,6 @@ booking_cost = {
 	"RD" : 10000,
 	"DI" : 5000
 }
-np.random.seed(133)
 
 #Distances
 Dgm = [[1000]] #From M to G (confirm)
@@ -90,8 +90,8 @@ Kidt = np.array([[[Did[D][I]*diesel_cost+booking_cost["DI"] for I in range(0,i)]
 Pjt = [[0 for J in range(j)] for T in range(t)]
 for T in range(t):
     Pjt[T][0] = 75000       #children
-    Pjt[T][1] = 50000       #Adults
-    Pjt[T][2] = 12150       #old
+    Pjt[T][1] = 50000       #adults
+    Pjt[T][2] = 50000       #elderly
 
 
 #Clinical cost per unit of vaccine
@@ -112,7 +112,7 @@ Cdrt = [[[25000 for D in range(d)] for R in range(r)] for T in range(t)]
 Cidt = [[[15000 for I in range(i)] for D in range(d)] for T in range(t)]
 
 #Demand
-wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about. Here, it is BCG.
+wastage_factor = 0.5 #This value will depend on the vaccine, we are talking about.
 
 #Fraction of demand
 Fr_d = 1
@@ -134,7 +134,7 @@ Bst = [[round(fraction_storage*6818182) for S in range(s)] for T in range(t)]
 df_brt = pd.read_csv("Input_data/capacity_RVS.csv")
 Brt = [[0 for R in range(r)] for T in range(t)]
 for index in df_brt.index:
-	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = round(fraction_storage*df_brt['Capacity'][index])
+	Brt[df_brt['t'][index]-1][df_brt['r'][index]-1] = fraction_storage*df_brt['Capacity'][index]
 
 
 df_bdt = pd.read_csv("Input_data/capacity_DVS.csv")
@@ -142,7 +142,7 @@ Bdt = [[0 for D in range(d)] for T in range(t)]
 for index in df_bdt.index:
 	if(df_bdt['d'][index] > d):
 		break
-	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = round(fraction_storage*df_bdt['Capacity'][index])
+	Bdt[df_bdt['t'][index]-1][df_bdt['d'][index]-1] = fraction_storage*df_bdt['Capacity'][index]
 
 
 df_bit = pd.read_csv("Input_data/capacity_clinics.csv")
@@ -150,14 +150,14 @@ Bit = [[0 for I in range(i)] for T in range(t)]
 for index in df_bit.index:
 	if(df_bit['i'][index] > i):
 		break
-	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = round(fraction_storage*df_bit['Capacity'][index])
+	Bit[df_bit['t'][index]-1][df_bit['i'][index]-1] = fraction_storage*df_bit['Capacity'][index]
 
 
 
 model = gp.Model('Vaccine_Distribution')
 
 #Production Capacity
-Bmt = [[1000000 for M in range(m)] for T in range(t)]
+Bmt = [[1500000 for M in range(m)] for T in range(t)]
 
 #Average time required to administer the vaccine (minutes)
 No = 5
@@ -330,7 +330,7 @@ for v in model.getVars():
 print("Done")
 
 # ###########################Code for full excel sheet results generation##########################
-workbook = xlsxwriter.Workbook('fraction-1.xlsx')
+workbook = xlsxwriter.Workbook('fraction-0.25.xlsx')
 worksheet = workbook.add_worksheet()
 merge_format = workbook.add_format({
     'bold': 1,
@@ -1149,13 +1149,8 @@ inventory_df = pd.DataFrame.from_dict(inventory_summary)
 ordering_df = pd.DataFrame.from_dict(ordering_summary)
 shortage_df = pd.DataFrame.from_dict(shortage_summary)
 
-# transport_df.to_excel("transport.xlsx")
-# inventory_df.to_excel("inventory.xlsx")
-# ordering_df.to_excel("ordering.xlsx")
-# shortage_df.to_excel("shortage.xlsx")
-
 ###########################################Compiled Results##################################################
-writer = pd.ExcelWriter('compiled.xlsx',engine='xlsxwriter')   
+writer = pd.ExcelWriter('compiled-0.25.xlsx',engine='xlsxwriter')   
 workbook=writer.book
 worksheet=workbook.add_worksheet('Compiled')
 writer.sheets['Compiled'] = worksheet

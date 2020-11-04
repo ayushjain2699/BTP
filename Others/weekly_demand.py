@@ -22,7 +22,7 @@ demand = 0
 for I in range(1,i+1):
 	for J in range(1,j+1):
 		col = 5+J
-		demand = sheet.cell_value(I,col)/12
+		demand = sheet.cell_value(I,col)/52
 		for T in range(1,t+1):
 			worksheet.write(row,0,I)
 			worksheet.write(row,1,J)

@@ -3,7 +3,7 @@ from xlwt import Workbook
 import xlrd
 
 wb = Workbook()
-loc = "C:/Users/Shanmukhi/Dropbox/Shanmukhi Ayush 2020/Data/Distances between stores/Bihar/SVS-RVS.xlsx"
+loc = "C:/Users/SHANMUKHI/Dropbox/Shanmukhi Ayush 2020/Data/Demand, Capacity, Distances/Distances between stores/Bihar/SVS-RVS.xlsx"
 workbook = xlrd.open_workbook(loc) 
 sheet = workbook.sheet_by_index(0)
 
@@ -23,5 +23,5 @@ for S in range(1,s+1):
 		sheet1.write(row,2,sheet.cell_value(1,R))
 		row = row + 1
 
-wb.save("C:/Users/Shanmukhi/Dropbox/Shanmukhi Ayush 2020/Data/Distances between stores/Bihar/distances_sr.xls")
+wb.save("C:/Users/SHANMUKHI/Dropbox/Shanmukhi Ayush 2020/Data/Demand, Capacity, Distances/Distances between stores/Bihar/distances_sr.xls")
 #wb.save("C:/Users/Shanmukhi/Desktop/test3.xlsx")
