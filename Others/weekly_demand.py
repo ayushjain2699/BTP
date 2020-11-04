@@ -14,15 +14,15 @@ wb = xlrd.open_workbook("Vaccine Quantities(Bihar).xlsx")
 sheet = wb.sheet_by_index(0)
 
 i = 606
-j = 3
+j = 2
 row = 1
 t = 12
 demand = 0
 
 for I in range(1,i+1):
-	for J in [8,9]:
-		col = J
-		demand = sheet.cell_value(I,col)/52
+	for J in range(1,j+1):
+		col = [8,9]
+		demand = sheet.cell_value(I,col[J-1])/52
 		for T in range(1,t+1):
 			worksheet.write(row,0,I)
 			worksheet.write(row,1,J)
