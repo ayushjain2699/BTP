@@ -1,24 +1,68 @@
 LOAD CSV FROM "file:///1-M%20to%20G.csv" as mg
 merge (m:Manufacturer {Name:toInteger(mg[0])})
 merge (g:GMSD {Name:toInteger(mg[1])})
-merge (m)-[:TO{quantites:mg[2]}]-(g)
+merge (m)-[:TO{quantites:mg[2]}]->(g)
 
 LOAD CSV FROM "file:///1-G%20to%20S.csv" as gs
 merge (s:SVS {Name:toInteger(gs[1])})
 merge (g:GMSD {Name:toInteger(gs[0])})
-merge (g)-[:TO{quantites:gs[2]}]-(s)
+merge (g)-[:TO{quantites:gs[2]}]->(s)
 
 LOAD CSV FROM "file:///1-S%20to%20R.csv" as sr
 merge (s:SVS {Name:toInteger(sr[0])})
 merge (r:RVS {Name:toInteger(sr[1])})
-merge (s)-[:TO{quantites:sr[2]}]-(r)
+merge (s)-[:TO{quantites:sr[2]}]->(r)
 
 LOAD CSV FROM "file:///1-R%20to%20D.csv" as rd
 merge (d:DVS {Name:toInteger(rd[1])})
 merge (r:RVS {Name:toInteger(rd[0])})
-merge (r)-[:TO{quantites:rd[2]}]-(d)
+merge (r)-[:TO{quantites:rd[2]}]->(d)
 
 LOAD CSV FROM "file:///1-D%20to%20I.csv" as di
 merge (d:DVS {Name:toInteger(di[0])})
 merge (i:Clinic {Name:toInteger(di[1])})
-merge (d)-[:TO{quantites:di[2]}]-(i)
+merge (d)-[:TO{quantites:di[2]}]->(i)
+
+------------------------------------==============----------------------------------
+match (n)-[r]-()
+delete n,r
+
+LOAD CSV WITH HEADERS FROM "file:///distances_di.csv" as di
+merge (d:DVS {Name:toInteger(di.d)})
+merge (i:Clinic {Name:toInteger(di.i)})
+merge (d)-[:TO{Distance:toInteger(di.Distance)}]->(i) 
+
+LOAD CSV WITH HEADERS FROM "file:///distances_rd.csv" as rd
+merge (r:RVS {Name:toInteger(rd.r)})
+merge (d:DVS {Name:toInteger(rd.d)})
+merge (r)-[:TO{Distance:toInteger(rd.Distance)}]->(d) 
+
+LOAD CSV WITH HEADERS FROM "file:///distances_sr.csv" as sr
+merge (s:SVS {Name:toInteger(sr.s)})
+merge (r:RVS {Name:toInteger(sr.r)})
+merge (s)-[:TO{Distance:toInteger(sr.Distance)}]->(r) 
+
+match (n:DVS)-[r]->() 
+where n.Name>=6
+delete r
+
+match (n:RVS)-[r]->(m:DVS) 
+where m.Name>=6
+delete r
+
+match (n:DVS)
+where n.Name>=6
+delete n
+
+match (n)-[r]->(m:Clinic) 
+where m.Name>=60
+delete r
+
+match (n:Clinic)
+where n.Name>=60
+delete n
+
+MATCH (start:SVS {Name:1}), (end:Clinic {Name: 1}) 
+CALL apoc.algo.dijkstra(start, end, 'TO','Distance') YIELD path, weight
+return path, weight
+
