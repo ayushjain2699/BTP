@@ -5,7 +5,7 @@ library(data.table)
 library(httr)
 library(jsonlite)
 
-data = read.csv("svs.csv") ###
+data = read.csv("dvs.csv") ###
 data = data[,]
 data$latitude = as.character(data$latitude)
 data$longitude = as.character(data$longitude)
@@ -49,11 +49,11 @@ for (i in 1:21)
         data = dcast(data,originIndex~destinationIndex,value.var = "travelDistance")
         
         
-        colnames(data) = c("SVS/DVS",index_names_dest) ###
-        data$`SVS/DVS` = index_names_origin    ###
+        colnames(data) = c("DVS/DVS",index_names_dest) ###
+        data$`DVS/DVS` = index_names_origin    ###
         if(i==1)
         {
-                write.csv(data,file = ".\\SVS-DVS.csv",row.names = F)
+                write.csv(data,file = ".\\DVS-DVS.csv",row.names = F)
         }
         if(i>1)
         {
